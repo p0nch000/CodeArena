@@ -1,13 +1,16 @@
-# CodeArena 
-**Plataforma Gamificada de Desafíos de Código**  
+# CodeArena
 
-CodeArena es un entorno interactivo donde los usuarios pueden resolver desafíos de programación, ganar recompensas y ascender en el ranking. Diseñada para mejorar habilidades de codificación en un ambiente competitivo y divertido, incluye:  
+**Elevate Your Programming Skills in a Collaborative Environment**
 
-## 🚀 Características  
-- ✅ **Desafíos de Código Generados por IA** con distintos niveles de dificultad.  
-- ✅ **Gamificación** con experiencia, insignias, rangos y misiones.  
-- ✅ **Editor de Código Integrado** con métricas de rendimiento en tiempo real.  
-- ✅ **Sistema de Ranking** basado en puntos y logros.  
-- ✅ **Dashboard para Administradores** con métricas y seguimiento del progreso.  
-- ✅ **Autenticación Segura** para garantizar la integridad del sistema.  
-- ✅ **Compatibilidad Multi-Plataforma** (Windows, macOS, Linux y navegadores principales).  
+CodeArena is a dynamic internal platform designed to enhance coding proficiency through structured challenges and healthy competition. This tool helps developers sharpen their skills while tracking professional growth.
+
+## Key Features
+
+- **AI-Powered Challenge System** delivering relevant coding problems tailored to skill levels
+- **Integrated Code Environment** providing real-time performance analytics
+- **Achievement Dashboard** to recognize technical excellence and improvement
+- **Administrative Analytics Portal** offering comprehensive metrics on team progress
+- **Enterprise-Grade Security** ensuring data protection and integrity
+- **Cross-Platform Compatibility** supporting Windows, macOS, Linux, and major browsers
+
+Join CodeArena to strengthen your programming expertise and showcase your technical capabilities in a structured, measurable environment.
