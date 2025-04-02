@@ -24,22 +24,26 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-mahindra-navy-blue flex items-center justify-center">
-      <div className="bg-[#1a202c] p-8 rounded-lg w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center space-y-3">
-          <Image
-            src="/logo.jpeg"
-            alt="Tech Mahindra Logo"
-            width={56}
-            height={56}
-          />
-          <h1 className="text-xl font-semibold text-mahindra-white">CodeArena</h1>
-          <p className="text-xs text-mahindra-light-gray">Please enter your credentials to continue</p>
+    <div className="min-h-screen bg-mahindra-navy-blue flex items-center justify-center p-4">
+      <div className="bg-[#1a202c] p-8 rounded-xl w-full max-w-[550px] flex flex-col gap-6">
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative w-14 h-14">
+            <Image
+              src="/logo.jpeg"
+              alt="Tech Mahindra Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-mahindra-white mb-1">CodeArena</h1>
+            <p className="text-sm text-mahindra-light-gray">Please enter your credentials</p>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="email" className="text-xs text-mahindra-light-gray">Email</label>
+            <label htmlFor="email" className="text-sm text-mahindra-light-gray">Email</label>
             <div className="relative">
               <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-mahindra-light-gray text-sm" />
               <input
@@ -47,14 +51,14 @@ export default function LoginForm() {
                 type="email"
                 value={credentials.email}
                 onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                className="w-full bg-mahindra-black/60 text-mahindra-white text-sm pl-9 pr-4 py-2.5 rounded-md focus:outline-none focus:ring-1 focus:ring-mahindra-red border border-transparent focus:border-mahindra-red/30"
+                className="w-full bg-mahindra-black/60 text-mahindra-white text-sm pl-9 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-mahindra-red border border-transparent focus:border-mahindra-red/30 transition-all"
                 placeholder="Enter your email"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="text-xs text-mahindra-light-gray">Password</label>
+            <label htmlFor="password" className="text-sm text-mahindra-light-gray">Password</label>
             <div className="relative">
               <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-mahindra-light-gray text-sm" />
               <input
@@ -62,7 +66,7 @@ export default function LoginForm() {
                 type={showPassword ? 'text' : 'password'}
                 value={credentials.password}
                 onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-                className="w-full bg-mahindra-black/60 text-mahindra-white text-sm pl-9 pr-10 py-2.5 rounded-md focus:outline-none focus:ring-1 focus:ring-mahindra-red border border-transparent focus:border-mahindra-red/30"
+                className="w-full bg-mahindra-black/60 text-mahindra-white text-sm pl-9 pr-10 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-mahindra-red border border-transparent focus:border-mahindra-red/30 transition-all"
                 placeholder="Enter your password"
               />
               <button
@@ -75,12 +79,12 @@ export default function LoginForm() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-1">
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="remember"
-                className="w-3.5 h-3.5 rounded bg-[#1e2330] border-mahindra-light-gray/30 text-mahindra-red focus:ring-1 focus:ring-mahindra-red"
+                className="w-3.5 h-3.5 rounded bg-[#1e2330] border-mahindra-light-gray/30 text-mahindra-red focus:ring-2 focus:ring-mahindra-red"
               />
               <label htmlFor="remember" className="ml-2 text-xs text-mahindra-light-gray">
                 Remember me
@@ -96,7 +100,7 @@ export default function LoginForm() {
 
           <button
             type="submit"
-            className="w-full bg-mahindra-red text-mahindra-white py-2.5 rounded-md hover:bg-mahindra-red/90 transition-colors text-sm font-medium mt-2"
+            className="w-full bg-mahindra-red text-mahindra-white py-2.5 rounded-lg hover:bg-mahindra-red/90 transition-all text-sm font-semibold shadow-lg hover:shadow-mahindra-red/20 mt-6"
           >
             Sign In
           </button>
