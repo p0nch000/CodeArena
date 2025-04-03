@@ -24,21 +24,24 @@ export default function LoginForm() {
   }
 
   return (
+    
     <div className="min-h-screen bg-mahindra-navy-blue flex items-center justify-center p-4">
+      
       <div className="bg-[#1a202c] p-8 rounded-xl w-full max-w-[550px] flex flex-col gap-6">
+        
         <div className="flex flex-col items-center gap-3">
-          <div className="relative w-14 h-14">
+          <div className="relative w-40 h-20">
             <Image
-              src="/logo.webp"
+              src="/code_arena_logo.png"
               alt="Tech Mahindra Logo"
               fill
-              className="object-contain"
+              className="object-contain w-full h-full"
             />
           </div>
-          <div className="text-center">
+          {/* <div className="text-center">
             <h1 className="text-xl font-bold text-mahindra-white mb-1">CodeArena</h1>
             <p className="text-sm text-mahindra-light-gray">Please enter your credentials</p>
-          </div>
+          </div> */}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,7 +83,7 @@ export default function LoginForm() {
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <input
                 type="checkbox"
                 id="remember"
@@ -95,7 +98,7 @@ export default function LoginForm() {
               className="text-xs text-mahindra-red hover:text-mahindra-red/80 transition-colors"
             >
               Forgot Password?
-            </a>
+            </a> */}
           </div>
 
           <button
