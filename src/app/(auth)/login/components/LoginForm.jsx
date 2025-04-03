@@ -29,7 +29,7 @@ export default function LoginForm() {
         <div className="flex flex-col items-center gap-3">
           <div className="relative w-14 h-14">
             <Image
-              src="/logo.jpeg"
+              src="/logo.webp"
               alt="Tech Mahindra Logo"
               fill
               className="object-contain"
