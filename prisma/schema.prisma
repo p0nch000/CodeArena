@@ -9,124 +9,138 @@ datasource db {
 
 //USER
 model User {
-  id            String          @id @default(uuid())
-  username      String          @unique
-  password      String
-  email         String          @unique
-  role          String
-  points        Int             @default(0)
+  id            String   @id @default(uuid())
+  username      String   @unique
+  password_hash String
+  email         String   @unique
+  role          Role     @default(user)
+  points        Int      @default(0)
   rank_id       String?
-  
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
   //Relations
-  rank          Rank?           @relation(fields: [rank_id], references: [id])
-  submissions   Submission[]
-  challenges    CodeChallenge[] @relation("CreatedBy")
+  rank        Rank?        @relation(fields: [rank_id], references: [id], onDelete: SetNull)
+  submissions Submission[]
+  challenges  Challenge[]  @relation("CreatedBy")
 
   @@map("users")
 }
 
-//CODE CHALLENGE
-model CodeChallenge {
-  id              String               @id @default(uuid())
-  title           String
-  description     String
-  difficulty      String
-  created_by      String
-  published       Boolean              @default(false)
-  runtime         Float?
-  memory          Float?
-  deadline        DateTime?
-  
-  //Relations
-  creator         User                 @relation("CreatedBy", fields: [created_by], references: [id])
-  submissions     Submission[]
-  test_cases      TestCase[]
-  metrics         CodeChallengeMetric?
+//CHALLENGE
+model Challenge {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  difficulty  Difficulty
+  created_by  String
+  published   Boolean    @default(false)
+  runtime     Float?
+  memory      Float?
+  deadline    DateTime?
+  created_at  DateTime   @default(now())
 
-  @@map("code_challenges")
+  //Relations
+  creator     User             @relation("CreatedBy", fields: [created_by], references: [id])
+  submissions Submission[]
+  test_cases  TestCase[]
+  metrics     ChallengeMetric?
+
+  @@map("challenges")
 }
 
 //SUBMISSION
 model Submission {
-  id                  String              @id @default(uuid())
-  user_id             String
-  challenge_id        String
-  final_code          String              @db.Text
-  submitted_at        DateTime            @default(now())
-  is_correct          Boolean             @default(false)
-  execution_time_final Float?
-  memory_space_final  Float?
-  language            String
-  status              String?
-  
+  id                   String   @id @default(uuid())
+  user_id              String
+  challenge_id         String
+  final_code           String   @db.Text
+  submitted_at         DateTime @default(now())
+  is_correct           Boolean  @default(false)
+  final_execution_time Float?
+  final_memory_space   Float?
+  programming_language String
+  status               String?
+
   //Relations
-  user                User                @relation(fields: [user_id], references: [id])
-  challenge           CodeChallenge       @relation(fields: [challenge_id], references: [id])
-  results             SubmissionResult[]
+  user      User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  challenge Challenge          @relation(fields: [challenge_id], references: [id], onDelete: Cascade)
+  results   SubmissionResult[]
 
   @@map("submissions")
 }
 
 //SUBMISSION RESULT
 model SubmissionResult {
-  id              String      @id @default(uuid())
-  test_case_id    String
-  submission_id   String
-  code            String      @db.Text
-  is_correct      Boolean
-  output          String?     @db.Text
-  execution_time  Float?
-  memory_space    Float?
-  error_message   String?     @db.Text
-  
+  id             String  @id @default(uuid())
+  test_case_id   String
+  submission_id  String
+  code           String  @db.Text
+  is_correct     Boolean
+  output_result  String? @db.Text
+  execution_time Float?
+  memory_space   Float?
+  error_message  String? @db.Text
+
   //Relations
-  test_case       TestCase    @relation(fields: [test_case_id], references: [id])
-  submission      Submission  @relation(fields: [submission_id], references: [id])
+  test_case  TestCase   @relation(fields: [test_case_id], references: [id], onDelete: Cascade)
+  submission Submission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
 
   @@map("submission_result")
 }
 
-
 //TEST CASE
 model TestCase {
-  id              String              @id @default(uuid())
+  id              String  @id @default(uuid())
   challenge_id    String
-  input           String              @db.Text
-  expected_output String              @db.Text
-  is_hidden       Boolean             @default(false)
-  
+  user_input      String  @db.Text
+  expected_output String  @db.Text
+  is_hidden       Boolean @default(false)
+
   //Relations
-  challenge       CodeChallenge       @relation(fields: [challenge_id], references: [id])
-  results         SubmissionResult[]
+  challenge Challenge          @relation(fields: [challenge_id], references: [id], onDelete: Cascade)
+  results   SubmissionResult[]
 
   @@map("test_case")
 }
 
-//CODE CHALLENGE METRIC
-model CodeChallengeMetric {
-  id                      String        @id @default(uuid())
-  challenge_id            String        @unique
-  total_submissions       Int           @default(0)
-  correct_submissions     Int           @default(0)
-  average_time_complexity String?
+//CHALLENGE METRIC
+model ChallengeMetric {
+  id                       String  @id @default(uuid())
+  challenge_id             String  @unique
+  total_submissions        Int     @default(0)
+  correct_submissions      Int     @default(0)
+  average_time_complexity  String?
   average_space_complexity String?
-  likes                   Int           @default(0)
-  
-  //Relations
-  challenge               CodeChallenge @relation(fields: [challenge_id], references: [id])
+  likes                    Int     @default(0)
 
-  @@map("codechallenge_metrics")
+  //Relations
+  challenge Challenge @relation(fields: [challenge_id], references: [id], onDelete: Cascade)
+
+  @@map("challenge_metrics")
 }
 
 //RANK
 model Rank {
-  id          String  @id @default(uuid())
-  name        String
-  min_points  Int
-  icon_url    String?
-  
+  id         String  @id @default(uuid())
+  name       String
+  min_points Int
+  icon_url   String?
+
   //Relations
-  users       User[]
+  users User[]
 
   @@map("ranks")
+}
+
+//ENUMS
+enum Role {
+  admin
+  user
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
 }
