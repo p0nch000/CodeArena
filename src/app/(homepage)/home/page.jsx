@@ -1,5 +1,6 @@
 import { CodeChallenge } from "./components"; 
 import { FeaturedCodeChallenge } from "./components";
+import  Leaderboard from "@/components/Leaderboard";
 
 export default function Homepage() {
   return (
@@ -30,6 +31,9 @@ export default function Homepage() {
             <CodeChallenge />
           </div>
         </div>
+
+        <Leaderboard />
+
       </div>
     </div>
   );
