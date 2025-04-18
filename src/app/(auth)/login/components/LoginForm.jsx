@@ -3,23 +3,44 @@
 import { useState } from 'react'
 import { FaUser, FaLock } from 'react-icons/fa'
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'
-import axios from 'axios'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 export default function LoginForm() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   const [credentials, setCredentials] = useState({
-    email: '',
+    mail: '',
     password: ''
   })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
+    setIsLoading(true)
+
     try {
-      const response = await axios.post('/api/auth/login', credentials)
-      //TODO: HANDLE SUCCESSFUL LOGIN
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to login')
+      }
+      router.push('/dashboard') 
+      router.refresh()
     } catch (error) {
-      //TODO: HANDLE ERROR
+      setError(error.message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -44,6 +65,12 @@ export default function LoginForm() {
           </div>
         </div>
 
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-sm rounded-lg p-3">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm text-mahindra-light-gray">Email</label>
@@ -52,10 +79,12 @@ export default function LoginForm() {
               <input
                 id="email"
                 type="email"
-                value={credentials.email}
-                onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+                value={credentials.mail}
+                onChange={(e) => setCredentials({ ...credentials, mail: e.target.value })}
                 className="w-full bg-mahindra-black/60 text-mahindra-white text-sm pl-9 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-mahindra-red border border-transparent focus:border-mahindra-red/30 transition-all"
                 placeholder="Enter your email"
+                disabled={isLoading}
+                required
               />
             </div>
           </div>
@@ -103,9 +132,10 @@ export default function LoginForm() {
 
           <button
             type="submit"
-            className="w-full bg-mahindra-red text-mahindra-white py-2.5 rounded-lg hover:bg-mahindra-red/90 transition-all text-sm font-semibold shadow-lg hover:shadow-mahindra-red/20 mt-6"
+            disabled={isLoading}
+            className="w-full bg-mahindra-red text-mahindra-white py-2.5 rounded-lg hover:bg-mahindra-red/90 transition-all text-sm font-semibold shadow-lg hover:shadow-mahindra-red/20 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
       </div>

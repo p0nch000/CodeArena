@@ -7,8 +7,6 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/react/**/*.js",
-
-    
   ],
   theme: {
     extend: {
@@ -20,8 +18,12 @@ module.exports = {
           'black': '#000000',
           'white': '#F9FAFB'
         },
+      },
+      fontFamily: {
+        'mono': ['"Roboto Mono"', 'monospace']
       }
     },
   },
   plugins: [],
-}; 
+};
+

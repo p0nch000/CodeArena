@@ -11,6 +11,9 @@
   "dependencies": {
     "@heroui/react": "^2.7.6",
     "@nextui-org/react": "^2.6.11",
+    "@fontsource/roboto-mono": "^5.2.5",
+    "@headlessui/react": "^2.2.2",
+    "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.5.0",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
