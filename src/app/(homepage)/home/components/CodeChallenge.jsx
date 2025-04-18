@@ -29,7 +29,7 @@ export default function CodeChallenge() {
         }
     };
     
-    // Ejemplo de dificultad (esto vendrá de los datos reales en el futuro)
+    // Ejemplo de dificultad
     const difficulty = "Medium";
     const difficultyStyles = getDifficultyStyles(difficulty);
     
