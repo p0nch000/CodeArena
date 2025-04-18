@@ -10,28 +10,27 @@ import {
   Chip,
 } from "@nextui-org/react";
 
-// Función para asignar estilos personalizados a cada badge
 function getBadgeStyles(badge) {
   switch (badge) {
     case "Elite":
       return {
-        backgroundColor: "#DC262633", // rojo intenso
-        textColor: "#DC2626", // rojo claro
+        backgroundColor: "#DC262633", 
+        textColor: "#DC2626", 
       };
     case "Master":
       return {
-        backgroundColor: "#A78BFA33", // morado
-        textColor: "#A78BFA", // morado claro
+        backgroundColor: "#A78BFA33", 
+        textColor: "#A78BFA", 
       };
     case "Expert":
       return {
-        backgroundColor: "#60A5FA33", // azul
-        textColor: "#60A5FA", // azul claro
+        backgroundColor: "#60A5FA33", 
+        textColor: "#60A5FA", 
       };
     default:
       return {
-        backgroundColor: "#6B728033", // gris neutro
-        textColor: "#6B7280", // gris claro
+        backgroundColor: "#6B728033", 
+        textColor: "#6B7280", 
       };
   }
 }
@@ -62,17 +61,17 @@ const users = [
 
 export default function Leaderboard() {
   return (
-    <div className="px-20 sm:px-10 lg:px-20 py-6">
-      <div className="w-full rounded-xl shadow-md border border-zinc-800 overflow-hidden">
+    <div className="w-full">
+      <div className="w-full rounded-xl overflow-hidden shadow-md border border-zinc-800 bg-mahindra-dark-blue">
         <Table
           isStriped
           removeWrapper
           aria-label="Leaderboard table"
           classNames={{
-            table: "bg-zinc-900 text-white",
-            th: "text-xs font-bold text-zinc-400 bg-zinc-800",
-            td: "text-sm text-zinc-300",
-            tr: "hover:bg-zinc-800 transition-colors",
+            table: "bg-mahindra-dark-blue text-white",
+            th: "text-xs font-bold text-zinc-300 bg-zinc-800/50 py-5 text-center uppercase tracking-wider",
+            td: "text-sm text-mahindra-light-gray py-4 text-center",
+            tr: "border-b border-zinc-800/30 transition-colors",
           }}
         >
           <TableHeader>
@@ -87,24 +86,34 @@ export default function Leaderboard() {
               const { backgroundColor, textColor } = getBadgeStyles(user.badge);
 
               return (
-                <TableRow key={user.id}>
-                  <TableCell className="text-red-400 font-semibold">#{idx + 1}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.challenges}</TableCell>
-                  <TableCell>{user.points.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Chip
-                      variant="shadow"
-                      size="sm"
-                      style={{
-                        backgroundColor,
-                        color: textColor,
-                        fontWeight: 600,
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      {user.badge}
-                    </Chip>
+                <TableRow 
+                  key={user.id} 
+                  className="group cursor-pointer"
+                >
+                  <TableCell className="text-red-400 font-semibold group-hover:bg-red-500/10">#{idx + 1}</TableCell>
+                  <TableCell className="text-mahindra-white font-medium group-hover:bg-red-500/10">{user.name}</TableCell>
+                  <TableCell className="group-hover:bg-red-500/10">{user.challenges}</TableCell>
+                  <TableCell className="group-hover:bg-red-500/10">{user.points.toLocaleString()}</TableCell>
+                  <TableCell className="group-hover:bg-red-500/10">
+                    <div className="flex justify-center">
+                      <Chip
+                        variant="shadow"
+                        size="sm"
+                        classNames={{
+                          base: "px-3 py-1.5",
+                          content: "font-semibold tracking-wide",
+                        }}
+                        style={{
+                          backgroundColor,
+                          color: textColor,
+                          fontWeight: 600,
+                          fontSize: "0.75rem",
+                          borderRadius: "9999px",
+                        }}
+                      >
+                        {user.badge}
+                      </Chip>
+                    </div>
                   </TableCell>
                 </TableRow>
               );

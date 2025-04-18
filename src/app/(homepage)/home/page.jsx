@@ -1,6 +1,6 @@
 import { CodeChallenge } from "./components"; 
 import { FeaturedCodeChallenge } from "./components";
-import  Leaderboard from "@/components/Leaderboard";
+import Leaderboard from "@/components/Leaderboard";
 
 export default function Homepage() {
   return (
@@ -15,25 +15,26 @@ export default function Homepage() {
         <h2 className="text-2xl font-bold text-mahindra-white mb-6">Active Challenges</h2>
         
         {/* Grid de desafíos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {/* Desafío - Easy */}
           <div className="w-full">
-            <CodeChallenge />
+            <CodeChallenge difficulty="Easy" />
           </div>
           
           {/* Desafío - Medium */}
           <div className="w-full">
-            <CodeChallenge />
+            <CodeChallenge difficulty="Medium" />
           </div>
           
           {/* Desafío - Hard */}
           <div className="w-full">
-            <CodeChallenge />
+            <CodeChallenge difficulty="Hard" />
           </div>
         </div>
 
+        {/* Top Performers Section */}
+        <h2 className="text-2xl font-bold text-mahindra-white mb-6">Top Performers</h2>
         <Leaderboard />
-
       </div>
     </div>
   );
