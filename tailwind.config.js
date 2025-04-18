@@ -15,8 +15,12 @@ module.exports = {
           'black': '#000000',
           'white': '#F9FAFB'
         },
+      },
+      fontFamily: {
+        'mono': ['"Roboto Mono"', 'monospace']
       }
     },
   },
   plugins: [],
-}; 
+};
+
