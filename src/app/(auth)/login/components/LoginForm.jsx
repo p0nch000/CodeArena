@@ -38,10 +38,10 @@ export default function LoginForm() {
               className="object-contain w-full h-full"
             />
           </div>
-          {/* <div className="text-center">
-            <h1 className="text-xl font-bold text-mahindra-white mb-1">CodeArena</h1>
+          <div className="text-center">
+            {/* <h1 className="text-xl font-bold text-mahindra-white mb-1">CodeArena</h1> */}
             <p className="text-sm text-mahindra-light-gray">Please enter your credentials</p>
-          </div> */}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
