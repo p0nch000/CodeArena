@@ -1,8 +1,8 @@
 export default function CodeChallenge() {
     
     return (
-        <div className="flex min-h-screen items-center justify-center w-full px-6">
-            <div className="w-full max-w-[450px] bg-mahindra-black rounded-xl p-6 relative font-mono">
+        <div className="w-full">
+            <div className="w-full bg-mahindra-dark-blue rounded-xl p-6 relative font-mono">
                 {/* Badge de dificultad y fecha en la parte superior */}
                 <div className="flex justify-between items-center mb-4">
                     <div className="inline-block bg-amber-700/30 text-amber-400 text-sm font-medium rounded-full px-4 py-1">

@@ -13,6 +13,7 @@ module.exports = {
       colors: {
         'mahindra': {
           'navy-blue': '#111827',
+          'dark-blue': '#0c111b',
           'red': '#DC2626',
           'light-gray': '#9CA3AF',
           'black': '#000000',
