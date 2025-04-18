@@ -1,12 +1,45 @@
 export default function CodeChallenge() {
+
+    //TODO: Incorporar todo lo del Backend como incluir el fetch para obtener los datos de la API como Server Component e incluir
+    //TODO: un skeleton para el cargado de datos. De igual forma manejo de View Challenge con el botón para navegar
+    
+    // Función para determinar las clases de estilo según la dificultad
+    const getDifficultyStyles = (difficulty) => {
+        switch(difficulty.toLowerCase()) {
+            case 'easy':
+                return {
+                    bg: 'bg-[#05966933]',
+                    text: 'text-[#34D399]'
+                };
+            case 'medium':
+                return {
+                    bg: 'bg-[#D9770633]',
+                    text: 'text-[#FBBF24]'
+                };
+            case 'hard':
+                return {
+                    bg: 'bg-[#DC262633]',
+                    text: 'text-[#F87171]'
+                };
+            default:
+                return {
+                    bg: 'bg-[#D9770633]',
+                    text: 'text-[#FBBF24]'
+                };
+        }
+    };
+    
+    // Ejemplo de dificultad (esto vendrá de los datos reales en el futuro)
+    const difficulty = "Medium";
+    const difficultyStyles = getDifficultyStyles(difficulty);
     
     return (
         <div className="flex min-h-screen items-center justify-center w-full px-6">
-            <div className="w-full max-w-[450px] bg-mahindra-black rounded-xl p-6 relative font-mono">
-                {/* Badge de dificultad y fecha en la parte superior */}
+            <div className="w-full max-w-[450px] bg-mahindra-dark-blue rounded-xl p-6 relative font-mono">
+                {/* Badge de dificultad */}
                 <div className="flex justify-between items-center mb-4">
-                    <div className="inline-block bg-amber-700/30 text-amber-400 text-sm font-medium rounded-full px-4 py-1">
-                        Medium
+                    <div className={`inline-block ${difficultyStyles.bg} ${difficultyStyles.text} text-sm font-medium rounded-full px-4 py-1`}>
+                        {difficulty}
                     </div>
                     
                     {/* Fecha - ahora en la parte superior */}
