@@ -153,6 +153,7 @@ export default function SignUpForm() {
             </div>
           </div>
 
+
           <button
             type="submit"
             disabled={isLoading || !acceptTerms}
