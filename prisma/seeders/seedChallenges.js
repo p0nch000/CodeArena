@@ -11,6 +11,7 @@ module.exports = async function seedChallenges(prisma) {
       difficulty: 'Easy',
       published: true,
       created_by: user?.id_user || null,
+      deadline: new Date(Date.now() + 1000 * 60 * 60 * 24),
     },
     {
       id_challenge: uuidv4(),
@@ -19,6 +20,7 @@ module.exports = async function seedChallenges(prisma) {
       difficulty: 'Medium',
       published: true,
       created_by: user?.id_user || null,
+      deadline: new Date(Date.now() + 1000 * 60 * 60 * 24),
     },
   ];
 

@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-///CHALLENGE METRICS
+/// CHALLENGE METRICS
 model challenge_metrics {
   id_metrics           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   total_submissions    Int        @default(0)
@@ -21,7 +21,7 @@ model challenge_metrics {
   @@index([id_challenge], map: "idx_metrics_challenge")
 }
 
-///CHALLENGES
+/// CHALLENGES
 model challenges {
   id_challenge      String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   title             String              @db.VarChar(100)
@@ -41,7 +41,7 @@ model challenges {
   @@index([created_by], map: "idx_challenges_created_by")
 }
 
-///RANKS
+/// RANKS
 model ranks {
   id_rank    String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name       String  @unique @db.VarChar(50)
@@ -50,7 +50,7 @@ model ranks {
   users      users[]
 }
 
-///SUBMISSION RESULTS
+/// SUBMISSION RESULTS
 model submission_result {
   id_result      String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   code           String
@@ -68,7 +68,7 @@ model submission_result {
   @@index([id_test_case], map: "idx_submission_result_test_case")
 }
 
-///SUBMISSIONS
+/// SUBMISSIONS
 model submissions {
   id_submission        String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   final_code           String
@@ -88,7 +88,7 @@ model submissions {
   @@index([id_user], map: "idx_submissions_user")
 }
 
-///TEST CASES
+/// TEST CASES
 model test_cases {
   id_test           String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   user_input        String
@@ -102,7 +102,7 @@ model test_cases {
   @@index([id_challenge], map: "idx_test_cases_id_challenge")
 }
 
-///USERS
+/// USERS
 model users {
   id_user       String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   username      String        @unique @db.VarChar(50)
