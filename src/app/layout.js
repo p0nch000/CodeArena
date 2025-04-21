@@ -42,7 +42,9 @@ export default function RootLayout({ children }) {
       >
         {/* Wrap the app with HeroUIProvider */}
         <HeroUIProvider>
-          {children}
+          <main className="dark">
+            {children}
+          </main>
         </HeroUIProvider>
       </body>
     </html>
