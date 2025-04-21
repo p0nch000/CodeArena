@@ -4,7 +4,7 @@ import Leaderboard from "@/components/Leaderboard";
 
 async function getFeaturedChallenge() {
   try {
-    const response = await fetch('http://localhost:3000/api/challenges/featured', { 
+    const response = await fetch(`${process.env.SITE_URL}/api/challenges/featured`, { 
       cache: 'no-store' 
     });
     const data = await response.json();
@@ -17,7 +17,7 @@ async function getFeaturedChallenge() {
 
 async function getActiveChallenges() {
   try {
-    const response = await fetch('http://localhost:3000/api/challenges', { 
+    const response = await fetch(`${process.env.SITE_URL}/api/challenges`, { 
       cache: 'no-store' 
     });
     const data = await response.json();
