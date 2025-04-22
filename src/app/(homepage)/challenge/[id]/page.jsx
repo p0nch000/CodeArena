@@ -23,8 +23,8 @@ export default function CodeChallengeSolve() {
 
   const problemData = {
     title: "Two Sum",
-    difficulty: "Hard",
-    description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. ",
+    difficulty: "Medium",
+    description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.Given an array of integers nums and an integer target, return indices of the Given an array of integers nums and an integer target, return indices of the ",
     example: {
       number: 1,
       input: "nums = [2,7,11,15], target = 9",

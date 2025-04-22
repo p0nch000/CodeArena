@@ -26,20 +26,17 @@ export default function ProblemStatement({
   const difficultyColor = getDifficultyColor(difficulty);
 
   return (
-    <div className="bg-[#1f2937] rounded-lg p-6 shadow-lg text-gray-200 w-auto max-w-[500px]">
+    <div className="bg-[#1f2937] rounded-lg p-6 shadow-lg text-gray-200 w-auto max-w-[500px] h-full">
       <div className="flex flex-col space-y-5">
         {/* Header */}
-        <div className="flex justify-between items-start">
-          <h2 className="text-2xl font-semibold">Problem Statement</h2>
+        <div className="flex justify-between items-start pb-4">
+        <h1 className="text-xl"><strong>{title}</strong></h1>
           <div className="flex-none">
             <span className={`${difficultyColor} px-4 py-1 text-sm rounded-full`}>
               {difficulty}
             </span>
           </div>
         </div>
-        
-        {/* Problem title */}
-        <h3 className="text-xl">{title}</h3>
         
         {/* Problem description */}
         <p className="text-base text-gray-300 leading-relaxed">
