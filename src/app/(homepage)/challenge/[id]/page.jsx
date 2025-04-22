@@ -23,8 +23,8 @@ export default function CodeChallengeSolve() {
 
   const problemData = {
     title: "Two Sum",
-    difficulty: "Medium",
-    description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+    difficulty: "Hard",
+    description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. ",
     example: {
       number: 1,
       input: "nums = [2,7,11,15], target = 9",
@@ -45,6 +45,18 @@ export default function CodeChallengeSolve() {
         number: 1,
         passed: true,
         input: "[2,7,11,15], target = 9",
+        output: "[0,1]"
+      },
+      {
+        number: 2,
+        passed: false,
+        input: "[3,2,4], target = 6",
+        output: "[0,1]"
+      },
+      {
+        number: 3,
+        passed: true,
+        input: "[3,2,4], target = 6",
         output: "[0,1]"
       }
     ]
@@ -125,13 +137,6 @@ export default function CodeChallengeSolve() {
     console.log("Submitting solution...");
   };
 
-  // Botones de selección rápida de lenguajes
-  const quickLanguages = [
-    { key: "PYTHON_LATEST", label: "Python" },
-    { key: "JAVASCRIPT_LATEST", label: "JavaScript" },
-    { key: "JAVA", label: "Java" },
-  ];
-
   return (
     <div className="flex flex-col w-full h-screen bg-[#0f1729] text-white font-mono">
       <div className="flex flex-row h-full">
@@ -139,25 +144,26 @@ export default function CodeChallengeSolve() {
           <ProblemStatement {...problemData} />
         </div>
 
-        <div className="flex-1 flex flex-col h-full overflow-hidden">
+        <div className="flex-1 flex flex-col h-full overflow-hidden mr-6">
           <PanelGroup direction="vertical" className="h-full">
             {/* Barra de lenguajes con esquinas superiores redondeadas */}
             <div className="bg-[#1f2937] rounded-t-lg px-2 pt-2 mt-6 flex items-center border-b border-zinc-700">
-              <div className="ml-3 pb-2 flex space-x-2 ">
+              <div className="ml-3 pb-2 flex space-x-2">
                 <Dropdown
                   options={languageOptions}
                   label=""
                   value={selectedLanguage}
                   onChange={handleLanguageChange}
-                  className="w-36"
+                  className="w-48"
+                  color="dark-blue-dropdown"
                 />
               </div>
             </div>
 
             {/* Editor de código */}
-            <Panel defaultSize={60} minSize={40} className="bg-[#1f2937]">
+            <Panel defaultSize={50} minSize={40} className="bg-[#1f2937]">
               <div className="h-full">
-                <div className="h-full">
+                <div className="h-full p-4 overflow-y-auto rounded-xl">
                   <MonacoEditor
                     language={monacoLanguageMap[selectedLanguage]}
                     value={code}
@@ -184,7 +190,7 @@ export default function CodeChallengeSolve() {
             </PanelResizeHandle>
 
             {/* Output Panel */}
-            <Panel defaultSize={40} minSize={30} className="bg-[#1f2937]">
+            <Panel defaultSize={50} minSize={30} className="bg-[#1f2937] rounded-b-lg mb-6">
               <div className="p-4 h-full overflow-y-auto">
                 <div className="flex justify-between items-center mb-3">
                   <div className="text-lg font-medium">Output</div>

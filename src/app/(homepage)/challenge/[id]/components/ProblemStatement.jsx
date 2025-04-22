@@ -7,6 +7,24 @@ export default function ProblemStatement({
   example,
   constraints
 }) {
+  // Function to determine badge color based on difficulty
+  const getDifficultyColor = (difficulty) => {
+    const lowerDifficulty = difficulty?.toLowerCase();
+    
+    switch (lowerDifficulty) {
+      case 'easy':
+        return 'bg-emerald-700/30 text-emerald-400'; // Green for Easy
+      case 'medium':
+        return 'bg-amber-700/30 text-amber-400'; // Yellow for Medium
+      case 'hard':
+        return 'bg-red-700/30 text-red-400'; // Red for Hard
+      default:
+        return 'bg-gray-500'; // Default color
+    }
+  };
+
+  const difficultyColor = getDifficultyColor(difficulty);
+
   return (
     <div className="bg-[#1f2937] rounded-lg p-6 shadow-lg text-gray-200 w-auto max-w-[500px]">
       <div className="flex flex-col space-y-5">
@@ -14,7 +32,7 @@ export default function ProblemStatement({
         <div className="flex justify-between items-start">
           <h2 className="text-2xl font-semibold">Problem Statement</h2>
           <div className="flex-none">
-            <span className="bg-mahindra-red px-4 py-1 text-sm rounded-full">
+            <span className={`${difficultyColor} px-4 py-1 text-sm rounded-full`}>
               {difficulty}
             </span>
           </div>

@@ -1,6 +1,6 @@
 export default function CodeOutput({ runtime, memory, testCases }) {
     return (
-      <div className="h-full flex flex-col">
+      <div className=" flex flex-col">
         <div className="flex items-center gap-4 mb-3">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
