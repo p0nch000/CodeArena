@@ -36,6 +36,39 @@ class Challenge {
     });
     return challenge;
   }
+
+  async getChallengeFiltered(difficultyFilter) {
+    try {
+      // Base where clause with published challenges that haven't expired
+      const whereClause = {
+        published: true,
+       /* deadline: {
+          gte: new Date(),
+        },*/
+      };
+      
+      // Add difficulty filter if it's not 'all' and handle case sensitivity
+      if (difficultyFilter !== 'all') {
+        // Usando expresión regular para hacer la búsqueda insensible a mayúsculas/minúsculas
+        whereClause.difficulty = {
+          mode: 'insensitive',
+          equals: difficultyFilter
+        };
+      }
+
+      
+      const filteredChallenges = await prisma.challenges.findMany({
+        where: whereClause,
+      });
+      
+      
+      return filteredChallenges;
+    } catch (error) {
+      console.error("Error fetching filtered challenges:", error);
+      return [];
+    }
+  }
+
 }
 
 export default new Challenge();
