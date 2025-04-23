@@ -13,7 +13,7 @@ const MonacoEditor = dynamic(() => import('./components/MonacoEditor'), { ssr: f
 export default function CodeChallengeSolve() {
   const params = useParams();
   const [id, setId] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('PYTHON_LATEST');
+  const [selectedLanguage, setSelectedLanguage] = useState('');
 
   useEffect(() => {
     if (params?.id) {
@@ -191,7 +191,7 @@ export default function CodeChallengeSolve() {
 
             {/* Output Panel */}
             <Panel defaultSize={50} minSize={30} className="bg-[#1f2937] rounded-b-lg mb-6">
-              <div className="p-4 h-full overflow-y-auto">
+              <div className="p-4 h-full overflow-y-auto pt-1">
                 <div className="flex justify-between items-center mb-3">
                   <div className="text-lg font-medium">Output</div>
                   <div className="flex space-x-2">

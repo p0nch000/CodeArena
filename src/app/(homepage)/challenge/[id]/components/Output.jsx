@@ -12,7 +12,7 @@ export default function CodeOutput({ runtime, memory, testCases }) {
           </div>
         </div>
         
-        <div className="bg-zinc-900 p-3 rounded text-sm font-mono flex-1 overflow-auto">
+        <div className="bg-zinc-900 p-3 rounded text-sm font-mono h-48 overflow-y-auto">
           {testCases.map((test, idx) => (
             <div key={idx} className="mb-2">
               <div className={test.passed ? 'text-green-400' : 'text-red-400'}>
