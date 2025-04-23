@@ -1,27 +1,54 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CodeChallengeFull } from "./components";
 import Dropdown from "../../../components/Dropdown";
 
 export default function Challenge() {
+    // Challenge state
+    const [challenges, setChallenges] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     // Filter states
     const [difficultyFilter, setDifficultyFilter] = useState("all");
-    const [dateFilter, setDateFilter] = useState("all");
     
     // Format difficulty options for the Dropdown component
-    const difficultyOptions = [
-        { key: "all", label: "All" },
-        { key: "easy", label: "Easy" },
-        { key: "medium", label: "Medium" },
-        { key: "hard", label: "Hard" }
-    ];
+    const difficultyOptions = ["all", "easy", "medium", "hard"];
+
+    // Function to fetch filtered challenges
+    const fetchFilteredChallenges = async () => {
+        setLoading(true);
+        try {
+
+                
+            const response = await fetch(
+                `/api/challenges/filtered?difficulty=${difficultyFilter}`
+            );
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                setChallenges(data.filteredChallenges);
+            } else {
+                console.error("Error fetching challenges:", data.error);
+                setChallenges([]);
+            }
+        } catch (error) {
+            console.error("Error fetching filtered challenges:", error);
+            setChallenges([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+        
+    // Apply filters function
+    const applyFilters = () => {
+        fetchFilteredChallenges();
+    };
     
-    // Format date options for the Dropdown component
-    const dateOptions = [
-        { key: "all", label: "All" },
-        { key: "newest", label: "Newest" },
-        { key: "oldest", label: "Oldest" }
-    ];
+    // Load challenges when component mounts
+    useEffect(() => {
+        fetchFilteredChallenges();
+    }, []);
     
     return (
         <div className="flex flex-col w-full px-8 py-8 max-w-screen-2xl mx-auto font-mono">
@@ -38,45 +65,44 @@ export default function Challenge() {
                     
                     {/* Difficulty filter using custom Dropdown */}
                     <div className="mb-8">
-                        <label className="block text-mahindra-light-gray text-sm mb-3">
-                            Difficulty
-                        </label>
                         <Dropdown 
                             options={difficultyOptions} 
                             label="Difficulty"
                             value={difficultyFilter}
-                            onChange={(val) => setDifficultyFilter(val)}
-                            className="w-full bg-mahindra-black text-white"
-                        />
-                    </div>
-                    
-                    {/* Date filter using custom Dropdown */}
-                    <div className="mb-8">
-                        <label className="block text-mahindra-light-gray text-sm mb-3">
-                            Date
-                        </label>
-                        <Dropdown 
-                            options={dateOptions} 
-                            label="Date"
-                            value={dateFilter}
-                            onChange={(val) => setDateFilter(val)}
-                            className="w-full bg-mahindra-black text-white"
+                            onChange={setDifficultyFilter}
                         />
                     </div>
                     
                     {/* Apply filters button */}
-                    <button className="w-full bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-3 rounded-md text-sm font-medium transition-colors">
+                    <button 
+                        onClick={applyFilters}
+                        className="w-full bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-3 rounded-md text-sm font-medium transition-colors"
+                    >
                         Apply Filters
                     </button>
                 </div>
                 
                 {/* Challenges column - More space between items */}
                 <div className="flex-1">
-                    <div className="space-y-8">
-                        <CodeChallengeFull difficulty="Medium" />
-                        <CodeChallengeFull difficulty="Easy" />
-                        <CodeChallengeFull difficulty="Hard" />
-                    </div>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-64">
+                            <div className="text-mahindra-white">Loading challenges...</div>
+                        </div>
+                    ) : challenges.length > 0 ? (
+                        <div className="space-y-8">
+                            {challenges.map(challenge => (
+                                <CodeChallengeFull 
+                                    key={challenge.id_challenge}
+                                    challenge={challenge}
+                                    difficulty={challenge.difficulty} 
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-mahindra-white text-center p-8">
+                            No challenges found with the selected filters.
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
