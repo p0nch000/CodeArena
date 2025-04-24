@@ -1,40 +1,34 @@
-export default function CodeChallengeFull({ difficulty = "Medium" }) {
-    const challengeData = {
-        Easy: {
-            title: "Array Manipulation Basics",
-            description: "Implement simple array operations to filter and transform data structures.",
-            points: 50,
-            dueDate: "28/04/2025",
-            badgeColor: "bg-emerald-700/30 text-emerald-400",
-            creator: "Alex Chen"
-        },
-        Medium: {
-            title: "Binary Tree Traversal",
-            description: "Implement three different methods to traverse a binary tree structure.",
-            points: 100,
-            dueDate: "30/04/2025",
-            badgeColor: "bg-amber-700/30 text-amber-400",
-            creator: "Maria Rodriguez"
-        },
-        Hard: {
-            title: "Graph Pathfinding Algorithm",
-            description: "Create an optimized algorithm to find the shortest path in a weighted directed graph.",
-            points: 200,
-            dueDate: "05/05/2025",
-            badgeColor: "bg-red-700/30 text-red-400",
-            creator: "James Wilson"
-        }
+import Link from 'next/link';
+
+export default function CodeChallengeFull({ challenge }) {
+    // Mapeo de colores de badge según dificultad
+    const badgeColors = {
+        'Easy': 'bg-emerald-700/30 text-emerald-400',
+        'Medium': 'bg-amber-700/30 text-amber-400',
+        'Hard': 'bg-red-700/30 text-red-400'
     };
 
-    const challenge = challengeData[difficulty];
+    // Mapeo de puntos según dificultad
+    const difficultyPoints = {
+        'Easy': 100,
+        'Medium': 200,
+        'Hard': 300
+    };
+
+    // Obtener el color de badge y los puntos según la dificultad
+    const badgeColor = challenge.badgeColor || badgeColors[challenge.difficulty] || badgeColors['Medium'];
+    const points = challenge.points || difficultyPoints[challenge.difficulty] || 200;
     
+    // Extraer solo la fecha del deadline (formato YYYY-MM-DD)
+    const formattedDeadline = challenge.deadline ? challenge.deadline.split('T')[0] : '';
+        
     return (
         <div className="w-full bg-mahindra-dark-blue rounded-xl p-6 font-mono text-mahindra-white transition-transform duration-300 hover:scale-[1.01] cursor-pointer">
             <div className="flex flex-col">
                 {/* Badge de dificultad y fecha en la parte superior */}
                 <div className="flex justify-between items-center mb-3">
-                    <div className={`inline-block ${challenge.badgeColor} text-sm font-medium rounded-full px-4 py-1`}>
-                        {difficulty}
+                    <div className={`inline-block ${badgeColor} text-sm font-medium rounded-full px-4 py-1`}>
+                        {challenge.difficulty}
                     </div>
                     
                     {/* Fecha - ahora en la parte superior */}
@@ -45,7 +39,7 @@ export default function CodeChallengeFull({ difficulty = "Medium" }) {
                             </svg>
                         </div>
                         <div>
-                            <span className="text-mahindra-white font-semibold">{challenge.dueDate}</span>
+                            <span className="text-mahindra-white font-semibold">{formattedDeadline}</span>
                         </div>
                     </div>
                 </div>
@@ -73,15 +67,18 @@ export default function CodeChallengeFull({ difficulty = "Medium" }) {
                             </svg>
                         </div>
                         <div>
-                            <span className="text-mahindra-white font-semibold">{challenge.points}</span>
+                            <span className="text-mahindra-white font-semibold">{points}</span>
                             <span className="text-mahindra-light-gray text-sm ml-1">pts</span>
                         </div>
                     </div>
                     
-                    {/* Botón de View Challenge */}
-                    <button className="hidden sm:block bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-2 rounded-md text-sm font-medium transition-colors transform hover:scale-105">
+                    {/* Reemplazando el botón por un Link */}
+                    <Link 
+                        href={`/challenge/${challenge.id_challenge}`}
+                        className="hidden sm:block bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-2 rounded-md text-sm font-medium transition-colors transform hover:scale-105"
+                    >
                         Start Challenge
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>

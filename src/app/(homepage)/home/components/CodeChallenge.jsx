@@ -1,4 +1,6 @@
-export default function CodeChallenge({challenge }) {
+import Link from 'next/link';
+
+export default function CodeChallenge( {challenge }) {
     const difficultyColors = {
         Easy: "bg-emerald-700/30 text-emerald-400",
         Medium: "bg-amber-700/30 text-amber-400",
@@ -65,12 +67,15 @@ export default function CodeChallenge({challenge }) {
                     </div>
                     
                     {/* Botón de View Challenge */}
-                    <button type="button" className="text-mahindra-red hover:text-mahindra-red font-medium text-sm flex items-center transition-transform hover:translate-x-1 group">
+                    <Link 
+                        href={`/challenge/${challenge?.id_challenge}`}
+                        className="text-mahindra-red hover:text-mahindra-red font-medium text-sm flex items-center transition-transform hover:translate-x-1 group"
+                    >
                         View Challenge
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" title="Arrow right">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>

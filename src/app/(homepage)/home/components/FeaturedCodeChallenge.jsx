@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function FeaturedCodeChallenge({ challenge }) {
     return (
         <div className="w-full bg-mahindra-dark-blue rounded-xl p-6 font-mono text-mahindra-white transition-transform duration-300 hover:scale-[1.01] cursor-pointer">
@@ -8,9 +10,12 @@ export default function FeaturedCodeChallenge({ challenge }) {
                         Featured Challenge
                     </div>
                     
-                    <button type="button" className="hidden sm:block bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-2 rounded-md text-sm font-medium transition-colors transform hover:scale-105">
+                    <Link 
+                        href={`/challenge/${challenge?.id_challenge}`}
+                        className="hidden sm:block bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-2 rounded-md text-sm font-medium transition-colors transform hover:scale-105"
+                    >
                         Start Challenge
-                    </button>
+                    </Link>
                 </div>
                 
                 {/* Challenge title */}
@@ -24,9 +29,12 @@ export default function FeaturedCodeChallenge({ challenge }) {
                 </p>
                 
                 {/* Mobile button (only visible on small screens) */}
-                <button type="button" className="sm:hidden w-full bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-2 rounded-md text-sm font-medium transition-colors transform hover:scale-105 mt-4">
+                <Link 
+                    href={`/challenge/${challenge?.id_challenge}`}
+                    className="sm:hidden w-full bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-2 rounded-md text-sm font-medium transition-colors transform hover:scale-105 mt-4 text-center"
+                >
                     Start Challenge
-                </button>
+                </Link>
             </div>
         </div>
     );
