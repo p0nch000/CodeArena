@@ -13,7 +13,7 @@ const MonacoEditor = dynamic(() => import('./components/MonacoEditor'), { ssr: f
 export default function CodeChallengeSolve() {
   const params = useParams();
   const [id, setId] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('Python (3.12.5)');
+  const [selectedLanguage, setSelectedLanguage] = useState('TypeScript (5.6.2)');
 
   useEffect(() => {
     if (params?.id) {
