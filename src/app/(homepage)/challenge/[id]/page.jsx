@@ -13,7 +13,7 @@ const MonacoEditor = dynamic(() => import('./components/MonacoEditor'), { ssr: f
 export default function CodeChallengeSolve() {
   const params = useParams();
   const [id, setId] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('PYTHON_LATEST');
+  const [selectedLanguage, setSelectedLanguage] = useState('Python (3.12.5)');
 
   useEffect(() => {
     if (params?.id) {
@@ -62,70 +62,262 @@ export default function CodeChallengeSolve() {
     ]
   });
 
+  // Array simplificado con solo los nombres de los lenguajes
   const languageOptions = [
-    { key: "JAVASCRIPT", label: "JavaScript (Node.js 12.14.0)" },
-    { key: "JAVASCRIPT_LATEST", label: "JavaScript (Node.js 22.08.0)" },
-    { key: "PYTHON", label: "Python (3.8.1)" },
-    { key: "PYTHON_LATEST", label: "Python (3.12.5)" },
-    { key: "JAVA", label: "Java (JDK 17.0.6)" },
-    { key: "CPP", label: "C++ (GCC 9.2.0)" },
-    { key: "CPP_LATEST", label: "C++ (GCC 14.1.0)" },
-    { key: "C", label: "C (GCC 9.2.0)" },
-    { key: "C_LATEST", label: "C (GCC 14.1.0)" },
-    { key: "CSHARP", label: "C# (Mono 6.6.0.161)" },
-    { key: "GO", label: "Go (1.13.5)" },
-    { key: "GO_LATEST", label: "Go (1.23.5)" },
-    { key: "RUST", label: "Rust (1.40.0)" },
-    { key: "RUST_LATEST", label: "Rust (1.85.0)" },
-    { key: "TYPESCRIPT", label: "TypeScript (3.7.4)" },
-    { key: "TYPESCRIPT_LATEST", label: "TypeScript (5.6.2)" }
+    "JavaScript (Node.js 12.14.0)",
+    "JavaScript (Node.js 22.08.0)",
+    "Python (3.8.1)",
+    "Python (3.12.5)",
+    "Java (JDK 17.0.6)",
+    "C++ (GCC 9.2.0)",
+    "C++ (GCC 14.1.0)",
+    "C (GCC 9.2.0)",
+    "C (GCC 14.1.0)",
+    "C# (Mono 6.6.0.161)",
+    "Go (1.13.5)",
+    "Go (1.23.5)",
+    "Rust (1.40.0)",
+    "Rust (1.85.0)",
+    "TypeScript (3.7.4)",
+    "TypeScript (5.6.2)"
   ];
 
-  const codeTemplates = {
-    JAVASCRIPT: `function twoSum(nums, target) {\n  // Write your code here\n  return [];\n}`,
-    JAVASCRIPT_LATEST: `function twoSum(nums, target) {\n  // Write your code here\n  return [];\n}`,
-    PYTHON: `def twoSum(nums, target):\n    # Write your code here\n    pass`,
-    PYTHON_LATEST: `def twoSum(nums, target):\n    # Write your code here\n    pass`,
-    JAVA: `public int[] twoSum(int[] nums, int target) {\n    // Write your code here\n    return new int[]{0, 1};\n}`,
-    CPP: `vector<int> twoSum(vector<int>& nums, int target) {\n    // Write your code here\n    return {0, 1};\n}`,
-    CPP_LATEST: `vector<int> twoSum(vector<int>& nums, int target) {\n    // Write your code here\n    return {0, 1};\n}`,
-    C: `int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    // Write your code here\n    *returnSize = 2;\n    int* result = malloc(2 * sizeof(int));\n    result[0] = 0;\n    result[1] = 1;\n    return result;\n}`,
-    C_LATEST: `int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    // Write your code here\n    *returnSize = 2;\n    int* result = malloc(2 * sizeof(int));\n    result[0] = 0;\n    result[1] = 1;\n    return result;\n}`,
-    CSHARP: `public int[] TwoSum(int[] nums, int target) {\n    // Write your code here\n    return new int[] {0, 1};\n}`,
-    GO: `func twoSum(nums []int, target int) []int {\n    // Write your code here\n    return []int{0, 1}\n}`,
-    GO_LATEST: `func twoSum(nums []int, target int) []int {\n    // Write your code here\n    return []int{0, 1}\n}`,
-    RUST: `pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n    // Write your code here\n    vec![0, 1]\n}`,
-    RUST_LATEST: `pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n    // Write your code here\n    vec![0, 1]\n}`,
-    TYPESCRIPT: `function twoSum(nums: number[], target: number): number[] {\n    // Write your code here\n    return [0, 1];\n}`,
-    TYPESCRIPT_LATEST: `function twoSum(nums: number[], target: number): number[] {\n    // Write your code here\n    return [0, 1];\n}`
-  };
-
+  // Mapeo de los nombres de lenguajes a los identificadores de Monaco
   const monacoLanguageMap = {
-    JAVASCRIPT: 'javascript',
-    JAVASCRIPT_LATEST: 'javascript',
-    PYTHON: 'python',
-    PYTHON_LATEST: 'python',
-    JAVA: 'java',
-    CPP: 'cpp',
-    CPP_LATEST: 'cpp',
-    C: 'c',
-    C_LATEST: 'c',
-    CSHARP: 'csharp',
-    GO: 'go',
-    GO_LATEST: 'go',
-    RUST: 'rust',
-    RUST_LATEST: 'rust',
-    TYPESCRIPT: 'typescript',
-    TYPESCRIPT_LATEST: 'typescript',
+    "JavaScript (Node.js 12.14.0)": 'javascript',
+    "JavaScript (Node.js 22.08.0)": 'javascript',
+    "Python (3.8.1)": 'python',
+    "Python (3.12.5)": 'python',
+    "Java (JDK 17.0.6)": 'java',
+    "C++ (GCC 9.2.0)": 'cpp',
+    "C++ (GCC 14.1.0)": 'cpp',
+    "C (GCC 9.2.0)": 'c',
+    "C (GCC 14.1.0)": 'c',
+    "C# (Mono 6.6.0.161)": 'csharp',
+    "Go (1.13.5)": 'go',
+    "Go (1.23.5)": 'go',
+    "Rust (1.40.0)": 'rust',
+    "Rust (1.85.0)": 'rust',
+    "TypeScript (3.7.4)": 'typescript',
+    "TypeScript (5.6.2)": 'typescript'
   };
 
-  const [code, setCode] = useState(codeTemplates[selectedLanguage]);
+  // Mapeo de los nombres de lenguajes a las plantillas de código
+const codeTemplates = {
+  "JavaScript (Node.js 12.14.0)": `/**
+ * Solución al problema
+ * @param {*} input - Ajusta los parámetros según el problema
+ * @return {*} - Ajusta el tipo de retorno según el problema
+ */
+function solution(input) {
+  // Tu código aquí
+  
+  return result;
+}`,
+
+  "JavaScript (Node.js 22.08.0)": `/**
+ * Solución al problema
+ * @param {*} input - Ajusta los parámetros según el problema
+ * @return {*} - Ajusta el tipo de retorno según el problema
+ */
+function solution(input) {
+  // Tu código aquí
+  
+  return result;
+}`,
+
+  "Python (3.8.1)": `def solution(input):
+    """
+    Solución al problema
+    
+    Args:
+        input: Ajusta los parámetros según el problema
+        
+    Returns:
+        Ajusta el tipo de retorno según el problema
+    """
+    # Tu código aquí
+    
+    return result`,
+
+  "Python (3.12.5)": `def solution(input):
+    """
+    Solución al problema
+    
+    Args:
+        input: Ajusta los parámetros según el problema
+        
+    Returns:
+        Ajusta el tipo de retorno según el problema
+    """
+    # Tu código aquí
+    
+    return result`,
+
+  "Java (JDK 17.0.6)": `/**
+ * Solución al problema
+ */
+public class Solution {
+    /**
+     * @param input Ajusta los parámetros según el problema
+     * @return Ajusta el tipo de retorno según el problema
+     */
+    public Object solve(Object input) {
+        // Tu código aquí
+        
+        return result;
+    }
+}`,
+
+  "C++ (GCC 9.2.0)": `/**
+ * Solución al problema
+ */
+#include <vector>
+#include <string>
+
+// Ajusta los parámetros y tipo de retorno según el problema
+auto solution(auto input) {
+    // Tu código aquí
+    
+    return result;
+}`,
+
+  "C++ (GCC 14.1.0)": `/**
+ * Solución al problema
+ */
+#include <vector>
+#include <string>
+
+// Ajusta los parámetros y tipo de retorno según el problema
+auto solution(auto input) {
+    // Tu código aquí
+    
+    return result;
+}`,
+
+  "C (GCC 9.2.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+#include <stdlib.h>
+
+void* solution(void* input) {
+    // Tu código aquí
+    
+    // No olvides liberar la memoria si es necesario
+    return result;
+}`,
+
+  "C (GCC 14.1.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+#include <stdlib.h>
+
+void* solution(void* input) {
+    // Tu código aquí
+    
+    // No olvides liberar la memoria si es necesario
+    return result;
+}`,
+
+  "C# (Mono 6.6.0.161)": `/**
+ * Solución al problema
+ */
+using System;
+
+public class Solution {
+    /**
+     * @param input Ajusta los parámetros según el problema
+     * @return Ajusta el tipo de retorno según el problema
+     */
+    public object Solve(object input) {
+        // Tu código aquí
+        
+        return result;
+    }
+}`,
+
+  "Go (1.13.5)": `package main
+
+/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+func solution(input interface{}) interface{} {
+    // Tu código aquí
+    
+    return result
+}`,
+
+  "Go (1.23.5)": `package main
+
+/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+func solution(input interface{}) interface{} {
+    // Tu código aquí
+    
+    return result
+}`,
+
+  "Rust (1.40.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+pub fn solution<T, U>(input: T) -> U {
+    // Tu código aquí
+    
+    result
+}`,
+
+  "Rust (1.85.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+pub fn solution<T, U>(input: T) -> U {
+    // Tu código aquí
+    
+    result
+}`,
+
+  "TypeScript (3.7.4)": `/**
+ * Solución al problema
+ * @param input - Ajusta los parámetros según el problema
+ * @returns Ajusta el tipo de retorno según el problema
+ */
+function solution(input: any): any {
+  // Tu código aquí
+  
+  return result;
+}`,
+
+  "TypeScript (5.6.2)": `/**
+ * Solución al problema
+ * @param input - Ajusta los parámetros según el problema
+ * @returns Ajusta el tipo de retorno según el problema
+ */
+function solution(input: any): any {
+  // Tu código aquí
+  
+  return result;
+}`
+};
+
+  const [code, setCode] = useState(codeTemplates[selectedLanguage]  || '');
 
   useEffect(() => {
-    setCode(codeTemplates[selectedLanguage]);
+    console.log("Lenguaje seleccionado:", selectedLanguage);
+    console.log("Monaco language mapping:", monacoLanguageMap[selectedLanguage]);
+    
+    if (codeTemplates[selectedLanguage]) {
+      setCode(codeTemplates[selectedLanguage]);
+    }
   }, [selectedLanguage]);
 
   const handleLanguageChange = (value) => {
+    console.log("Cambiando lenguaje a:", value);
     setSelectedLanguage(value);
   };
 
@@ -161,11 +353,11 @@ export default function CodeChallengeSolve() {
             </div>
 
             {/* Editor de código */}
-            <Panel defaultSize={50} minSize={40} className="bg-[#1f2937]">
+            <Panel defaultSize={60} minSize={40} className="bg-[#1f2937]">
               <div className="h-full">
                 <div className="h-full p-4 overflow-y-auto rounded-xl">
                   <MonacoEditor
-                    language={monacoLanguageMap[selectedLanguage]}
+                    language={monacoLanguageMap[selectedLanguage] || 'plaintext'}
                     value={code}
                     onChange={(newValue) => setCode(newValue)}
                     options={{
@@ -190,7 +382,7 @@ export default function CodeChallengeSolve() {
             </PanelResizeHandle>
 
             {/* Output Panel */}
-            <Panel defaultSize={50} minSize={30} className="bg-[#1f2937] rounded-b-lg mb-6">
+            <Panel defaultSize={40} minSize={30} className="bg-[#1f2937] rounded-b-lg mb-6">
               <div className="p-4 h-full overflow-y-auto">
                 <div className="flex justify-between items-center mb-3">
                   <div className="text-lg font-medium">Output</div>
