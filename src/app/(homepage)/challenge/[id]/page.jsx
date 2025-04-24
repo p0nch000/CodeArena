@@ -10,18 +10,52 @@ import dynamic from 'next/dynamic';
 
 const MonacoEditor = dynamic(() => import('./components/MonacoEditor'), { ssr: false });
 
+// En page.jsx - Mejora la función getProblemData
+async function getProblemData(id) {
+  try {
+    const response = await fetch(`/api/challenges/${id}`, {
+      cache: 'no-store'
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      return data.challenge;
+    } else {
+      console.error('Client - Error fetching problem data:', data.error);
+      return null;
+    }
+  } catch (error) {
+    console.error('Client - Fetch error:', error);
+    return null;
+  }
+}
+
 export default function CodeChallengeSolve() {
   const params = useParams();
   const [id, setId] = useState(null);
+  const [problemData, setProblemData] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState('TypeScript (5.6.2)');
-
+  
   useEffect(() => {
     if (params?.id) {
       setId(params.id);
     }
   }, [params]);
+  
+  // Corrige el useEffect para mostrar el data recibido, no problemData
+  useEffect(() => {
+    async function fetchProblemData() {
+      if (id) {
+        const data = await getProblemData(id);
+        setProblemData(data);
+      }
+    }
+    
+    fetchProblemData();
+  }, [id]);
 
-  const problemData = {
+  /*const problemData = {
     title: "Two Sum",
     difficulty: "Medium",
     description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.Given an array of integers nums and an integer target, return indices of the Given an array of integers nums and an integer target, return indices of the ",
@@ -35,7 +69,9 @@ export default function CodeChallengeSolve() {
       "-109 ≤ nums[i] ≤ 109",
       "-109 ≤ target ≤ 109"
     ]
-  };
+  };*/
+
+  
 
   const [testResults, setTestResults] = useState({
     runtime: "42ms",
@@ -304,6 +340,8 @@ function solution(input: any): any {
   return result;
 }`
 };
+
+   
 
   const [code, setCode] = useState(codeTemplates[selectedLanguage]  || '');
 
