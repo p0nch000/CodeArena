@@ -4,7 +4,7 @@ export default function ProblemStatement({
   title,
   difficulty,
   description,
-  example,
+  examples,
   constraints
 }) {
   // Function to determine badge color based on difficulty
@@ -30,7 +30,7 @@ export default function ProblemStatement({
       <div className="flex flex-col space-y-5">
         {/* Header */}
         <div className="flex justify-between items-start pb-4">
-        <h1 className="text-xl"><strong>{title}</strong></h1>
+          <h1 className="text-xl"><strong>{title}</strong></h1>
           <div className="flex-none">
             <span className={`${difficultyColor} px-4 py-1 text-sm rounded-full`}>
               {difficulty}
@@ -43,26 +43,23 @@ export default function ProblemStatement({
           {description}
         </p>
         
-        {/* Example */}
-        {example && (
+        {/* Example - mostrar como texto */}
+        {examples && (
           <div>
-            <h4 className="text-lg mb-2">Example {example.number}:</h4>
-            <div className="bg-[#111827] rounded-md p-4 font-mono text-sm">
-              <div>Input: {example.input}</div>
-              <div>Output: {example.output}</div>
+            <h4 className="text-lg mb-2">Example:</h4>
+            <div className="bg-[#111827] rounded-md p-4 font-mono text-sm whitespace-pre-wrap">
+              {examples}
             </div>
           </div>
         )}
         
-        {/* Constraints */}
-        {constraints && constraints.length > 0 && (
+        {/* Constraints - mostrar como texto */}
+        {constraints && (
           <div>
             <h4 className="text-lg mb-2">Constraints:</h4>
-            <ul className="text-gray-300 space-y-1">
-              {constraints.map((constraint, idx) => (
-                <li key={idx} className="text-sm">{constraint}</li>
-              ))}
-            </ul>
+            <div className="text-gray-300 bg-[#111827] rounded-md p-4 font-mono text-sm whitespace-pre-wrap">
+              {constraints}
+            </div>
           </div>
         )}
       </div>
