@@ -1,11 +1,14 @@
+"use client";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation'; // Cambia a usePathname de next/navigation
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const navigation = [
-  { name: 'Home', href: '#', current: true },
-  { name: 'Code Challenges', href: '#', current: false },
-  { name: 'Leaderboard', href: '#', current: false },
-  { name: 'Dashboard', href: '#', current: false },
+  { name: 'Home', href: '/home' },
+  { name: 'Code Challenges', href: '/challenge' },
+  { name: 'Leaderboard', href: '/leaderboard' },
+  { name: 'Dashboard', href: '/dashboard' },
 ];
 
 function classNames(...classes) {
@@ -13,6 +16,8 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
+  const pathname = usePathname(); // Obtén la ruta actual
+
   return (
     <Disclosure as="nav" className="bg-black">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -41,16 +46,16 @@ export default function Navbar() {
             <div className="hidden sm:block font-mono">
               <div className="flex space-x-16">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
                     href={item.href}
-                    aria-current={item.current ? 'page' : undefined}
+                    aria-current={pathname === item.href ? 'page' : undefined} // Verifica la ruta actual
                     className={classNames(
-                      item.current ? 'text-white' : 'text-gray-300 hover:text-white',
+                      pathname === item.href ? 'text-white' : 'text-gray-300 hover:text-white', // Aplica la clase activa
                     )}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -83,9 +88,9 @@ export default function Navbar() {
               key={item.name}
               as="a"
               href={item.href}
-              aria-current={item.current ? 'page' : undefined}
+              aria-current={pathname === item.href ? 'page' : undefined}
               className={classNames(
-                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                pathname === item.href ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                 'block rounded-md px-3 py-2 text-base font-medium font-robotoMono'
               )}
             >
