@@ -103,32 +103,221 @@ export default function CodeChallengeSolve() {
   };
 
   // Mapeo de los nombres de lenguajes a las plantillas de código
-  const codeTemplates = {
-    "JavaScript (Node.js 12.14.0)": `function twoSum(nums, target) {\n  // Write your code here\n  return [];\n}`,
-    "JavaScript (Node.js 22.08.0)": `function twoSum(nums, target) {\n  // Write your code here\n  return [];\n}`,
-    "Python (3.8.1)": `def twoSum(nums, target):\n    # Write your code here\n    pass`,
-    "Python (3.12.5)": `def twoSum(nums, target):\n    # Write your code here\n    pass`,
-    "Java (JDK 17.0.6)": `public int[] twoSum(int[] nums, int target) {\n    // Write your code here\n    return new int[]{0, 1};\n}`,
-    "C++ (GCC 9.2.0)": `vector<int> twoSum(vector<int>& nums, int target) {\n    // Write your code here\n    return {0, 1};\n}`,
-    "C++ (GCC 14.1.0)": `vector<int> twoSum(vector<int>& nums, int target) {\n    // Write your code here\n    return {0, 1};\n}`,
-    "C (GCC 9.2.0)": `int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    // Write your code here\n    *returnSize = 2;\n    int* result = malloc(2 * sizeof(int));\n    result[0] = 0;\n    result[1] = 1;\n    return result;\n}`,
-    "C (GCC 14.1.0)": `int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    // Write your code here\n    *returnSize = 2;\n    int* result = malloc(2 * sizeof(int));\n    result[0] = 0;\n    result[1] = 1;\n    return result;\n}`,
-    "C# (Mono 6.6.0.161)": `public int[] TwoSum(int[] nums, int target) {\n    // Write your code here\n    return new int[] {0, 1};\n}`,
-    "Go (1.13.5)": `func twoSum(nums []int, target int) []int {\n    // Write your code here\n    return []int{0, 1}\n}`,
-    "Go (1.23.5)": `func twoSum(nums []int, target int) []int {\n    // Write your code here\n    return []int{0, 1}\n}`,
-    "Rust (1.40.0)": `pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n    // Write your code here\n    vec![0, 1]\n}`,
-    "Rust (1.85.0)": `pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n    // Write your code here\n    vec![0, 1]\n}`,
-    "TypeScript (3.7.4)": `function twoSum(nums: number[], target: number): number[] {\n    // Write your code here\n    return [0, 1];\n}`,
-    "TypeScript (5.6.2)": `function twoSum(nums: number[], target: number): number[] {\n    // Write your code here\n    return [0, 1];\n}`
-  };
+const codeTemplates = {
+  "JavaScript (Node.js 12.14.0)": `/**
+ * Solución al problema
+ * @param {*} input - Ajusta los parámetros según el problema
+ * @return {*} - Ajusta el tipo de retorno según el problema
+ */
+function solution(input) {
+  // Tu código aquí
+  
+  return result;
+}`,
 
-  const [code, setCode] = useState(codeTemplates[selectedLanguage]);
+  "JavaScript (Node.js 22.08.0)": `/**
+ * Solución al problema
+ * @param {*} input - Ajusta los parámetros según el problema
+ * @return {*} - Ajusta el tipo de retorno según el problema
+ */
+function solution(input) {
+  // Tu código aquí
+  
+  return result;
+}`,
+
+  "Python (3.8.1)": `def solution(input):
+    """
+    Solución al problema
+    
+    Args:
+        input: Ajusta los parámetros según el problema
+        
+    Returns:
+        Ajusta el tipo de retorno según el problema
+    """
+    # Tu código aquí
+    
+    return result`,
+
+  "Python (3.12.5)": `def solution(input):
+    """
+    Solución al problema
+    
+    Args:
+        input: Ajusta los parámetros según el problema
+        
+    Returns:
+        Ajusta el tipo de retorno según el problema
+    """
+    # Tu código aquí
+    
+    return result`,
+
+  "Java (JDK 17.0.6)": `/**
+ * Solución al problema
+ */
+public class Solution {
+    /**
+     * @param input Ajusta los parámetros según el problema
+     * @return Ajusta el tipo de retorno según el problema
+     */
+    public Object solve(Object input) {
+        // Tu código aquí
+        
+        return result;
+    }
+}`,
+
+  "C++ (GCC 9.2.0)": `/**
+ * Solución al problema
+ */
+#include <vector>
+#include <string>
+
+// Ajusta los parámetros y tipo de retorno según el problema
+auto solution(auto input) {
+    // Tu código aquí
+    
+    return result;
+}`,
+
+  "C++ (GCC 14.1.0)": `/**
+ * Solución al problema
+ */
+#include <vector>
+#include <string>
+
+// Ajusta los parámetros y tipo de retorno según el problema
+auto solution(auto input) {
+    // Tu código aquí
+    
+    return result;
+}`,
+
+  "C (GCC 9.2.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+#include <stdlib.h>
+
+void* solution(void* input) {
+    // Tu código aquí
+    
+    // No olvides liberar la memoria si es necesario
+    return result;
+}`,
+
+  "C (GCC 14.1.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+#include <stdlib.h>
+
+void* solution(void* input) {
+    // Tu código aquí
+    
+    // No olvides liberar la memoria si es necesario
+    return result;
+}`,
+
+  "C# (Mono 6.6.0.161)": `/**
+ * Solución al problema
+ */
+using System;
+
+public class Solution {
+    /**
+     * @param input Ajusta los parámetros según el problema
+     * @return Ajusta el tipo de retorno según el problema
+     */
+    public object Solve(object input) {
+        // Tu código aquí
+        
+        return result;
+    }
+}`,
+
+  "Go (1.13.5)": `package main
+
+/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+func solution(input interface{}) interface{} {
+    // Tu código aquí
+    
+    return result
+}`,
+
+  "Go (1.23.5)": `package main
+
+/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+func solution(input interface{}) interface{} {
+    // Tu código aquí
+    
+    return result
+}`,
+
+  "Rust (1.40.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+pub fn solution<T, U>(input: T) -> U {
+    // Tu código aquí
+    
+    result
+}`,
+
+  "Rust (1.85.0)": `/**
+ * Solución al problema
+ * Ajusta los parámetros y tipo de retorno según el problema
+ */
+pub fn solution<T, U>(input: T) -> U {
+    // Tu código aquí
+    
+    result
+}`,
+
+  "TypeScript (3.7.4)": `/**
+ * Solución al problema
+ * @param input - Ajusta los parámetros según el problema
+ * @returns Ajusta el tipo de retorno según el problema
+ */
+function solution(input: any): any {
+  // Tu código aquí
+  
+  return result;
+}`,
+
+  "TypeScript (5.6.2)": `/**
+ * Solución al problema
+ * @param input - Ajusta los parámetros según el problema
+ * @returns Ajusta el tipo de retorno según el problema
+ */
+function solution(input: any): any {
+  // Tu código aquí
+  
+  return result;
+}`
+};
+
+  const [code, setCode] = useState(codeTemplates[selectedLanguage]  || '');
 
   useEffect(() => {
-    setCode(codeTemplates[selectedLanguage]);
+    console.log("Lenguaje seleccionado:", selectedLanguage);
+    console.log("Monaco language mapping:", monacoLanguageMap[selectedLanguage]);
+    
+    if (codeTemplates[selectedLanguage]) {
+      setCode(codeTemplates[selectedLanguage]);
+    }
   }, [selectedLanguage]);
 
   const handleLanguageChange = (value) => {
+    console.log("Cambiando lenguaje a:", value);
     setSelectedLanguage(value);
   };
 
@@ -168,7 +357,7 @@ export default function CodeChallengeSolve() {
               <div className="h-full">
                 <div className="h-full p-4 overflow-y-auto rounded-xl">
                   <MonacoEditor
-                    language={monacoLanguageMap[selectedLanguage]}
+                    language={monacoLanguageMap[selectedLanguage] || 'plaintext'}
                     value={code}
                     onChange={(newValue) => setCode(newValue)}
                     options={{
