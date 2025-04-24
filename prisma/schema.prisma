@@ -31,6 +31,8 @@ model challenges {
   runtime           Decimal?            @db.Decimal(10, 2)
   memory            Decimal?            @db.Decimal(10, 2)
   deadline          DateTime?           @db.Timestamp(6)
+  examples          String
+  constraints       String
   created_by        String?             @db.Uuid
   created_at        DateTime?           @default(now()) @db.Timestamp(6)
   challenge_metrics challenge_metrics[]
