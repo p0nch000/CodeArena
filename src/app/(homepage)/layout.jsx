@@ -8,9 +8,9 @@ export default function RootLayout({ children }) {
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
           <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         </head>
-        <body className="bg-mahindra-navy-blue min-h-screen">
+        <body className="bg-mahindra-navy-blue min-h-screen text-md">
           <Navbar />
-          <main>
+          <main className="scale-90 origin-top">
             {children}
           </main>
           <Footer />
