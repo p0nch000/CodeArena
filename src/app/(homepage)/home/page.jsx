@@ -1,6 +1,6 @@
 import { CodeChallenge } from "./components"; 
 import { FeaturedCodeChallenge } from "./components";
-import Leaderboard from "@/components/Leaderboard";
+import { TopLeaderboard } from "./components/TopLeaderboard";
 
 async function getFeaturedChallenge() {
   try {
@@ -28,9 +28,23 @@ async function getActiveChallenges() {
   }
 }
 
+async function getTopPerformers() {
+  try {
+    const response = await fetch(`${process.env.SITE_URL}/api/leaderboard/top?limit=5`, {
+      cache: 'no-store'
+    });
+    const data = await response.json();
+    return data.success ? data.topUsers : [];
+  } catch (error) {
+    console.error('Error fetching top performers:', error);
+    return [];
+  }
+}
+
 export default async function Homepage() {
   const featuredChallenge = await getFeaturedChallenge();
   const activeChallenges = await getActiveChallenges();
+  const topPerformers = await getTopPerformers();
 
   return (
     <div className="flex flex-col w-full px-6 py-5 max-w-7xl mx-auto font-mono">
@@ -68,7 +82,9 @@ export default async function Homepage() {
 
         {/* Top Performers Section */}
         <h2 className="text-2xl font-bold text-mahindra-white mb-6">Top Performers</h2>
-        <Leaderboard />
+        <div className="bg-mahindra-dark-blue border border-gray-800 rounded-xl overflow-hidden">
+          <TopLeaderboard topUsers={topPerformers} />
+        </div>
       </div>
     </div>
   );

@@ -21,7 +21,8 @@ class Challenge {
         },
         orderBy: {
           deadline: 'asc',
-        }
+        },
+        take: 3
       });
       return activeChallenges;
     } catch (error) {
