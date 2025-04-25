@@ -57,6 +57,41 @@ const users = [
     points: 1760,
     badge: "Expert",
   },
+  {
+    id: 4,
+    name: "John Doe",
+    challenges: 35,
+    points: 1760,
+    badge: "Expert",
+  },
+  {
+    id: 5,
+    name: "John Doe",
+    challenges: 35,
+    points: 1760,
+    badge: "Expert",
+  },
+  {
+    id: 6,
+    name: "John Doe",
+    challenges: 35,
+    points: 1760,
+    badge: "Expert",
+  },
+  {
+    id: 7,
+    name: "John Doe",
+    challenges: 35,
+    points: 1760,
+    badge: "Expert",
+  },
+  {
+    id: 8,
+    name: "John Doe",
+    challenges: 35,
+    points: 1760,
+    badge: "Expert",
+  },
 ];
 
 export default function Leaderboard() {
