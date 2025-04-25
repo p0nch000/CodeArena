@@ -370,7 +370,7 @@ function solution(input: any): any {
   return (
     <div className="flex flex-col w-full h-screen bg-[#0f1729] text-white font-mono">
       <div className="flex flex-row h-full">
-        <div className="w-1/3 bg-[#0f1729] p-6 overflow-y-auto flex items-start">
+        <div className="w-1/3 bg-[#0f1729] p-6 overflow-y-auto items-center">
           <ProblemStatement {...problemData} />
         </div>
 
