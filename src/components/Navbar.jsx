@@ -36,10 +36,13 @@ export default function Navbar() {
           <div className="flex flex-1 items-center justify-center relative">
             {/* Logo */}
             <div className="absolute left-0 flex items-center">
-              <div className="flex items-center text-red-600 font-robotoMono">
-                <span className="text-2xl mr-1">&lt;/&gt;</span>
-                <span className="text-white text-xl font-semibold">CodeArena</span>
-              </div>
+            <Link href="/home" className="flex items-center">
+              <img
+                src="/logoTextoCodeArena.png" // ← Pon aquí la URL de tu logo
+              alt="Company Logo"
+              className="h-10 w-auto"
+              />
+            </Link>
             </div>
 
             {/* Menú navegación */}
