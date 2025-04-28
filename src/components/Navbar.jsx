@@ -38,10 +38,13 @@ export default function Navbar() {
             <div className="absolute left-0 flex items-center">
             <Link href="/home" className="flex items-center">
               <img
-                src="/logoTextoCodeArena.png" // ← Pon aquí la URL de tu logo
+                src="/CodeArenaLogoNoText.png" // ← Pon aquí la URL de tu logo
               alt="Company Logo"
-              className="h-10 w-auto"
+              className="h-6 w-7"
               />
+              <span className="text-white font-mono text-xl tracking-tight hidden sm:block ml-2">
+                  CodeArena
+                </span>
             </Link>
             </div>
 
