@@ -2,19 +2,19 @@ import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white py-4 relative">
+    <footer className="bg-black text-white py-4 pt-2 pb-2">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-        <div className="relative flex justify-end items-center">
-          {/* Logo centrado */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
+        <div className="flex justify-between items-center">
+          {/* Logo a la izquierda */}
+          <div className="flex items-center">
             <img
-              src="logoMTH.png" // ← Cambia esta URL por la de tu logo
+              src="logoMTH.png" 
               alt="Company Logo"
               className="h-10 w-auto"
             />
           </div>
 
-          {/* Social Links */}
+          {/* Social Links a la derecha */}
           <div className="flex space-x-6 items-center">
             <a href="https://github.com" target="_blank" rel="noopener noreferrer" 
                className="text-gray-400 hover:text-white transition-colors">
