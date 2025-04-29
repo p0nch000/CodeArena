@@ -57,18 +57,18 @@ export default function SignUpForm() {
     <div className="min-h-screen bg-mahindra-navy-blue flex items-center justify-center p-4">
       <div className="bg-[#1a202c] p-8 rounded-xl w-full max-w-[550px] flex flex-col gap-6">
         <div className="flex flex-col items-center gap-3">
-          <div className="relative w-14 h-14">
-            <Image
-              src="/logo.webp"
-              alt="Tech Mahindra Logo"
-              fill
-              className="object-contain"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative w-7 h-6">
+              <Image
+                src="/CodeArenaLogoNoText.png"
+                alt="CodeArena Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <span className="text-white font-mono text-xl tracking-tight">CodeArena</span>
           </div>
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-mahindra-white mb-1">CodeArena</h1>
-            <p className="text-sm text-mahindra-light-gray">Create a new account</p>
-          </div>
+          <p className="text-sm text-mahindra-light-gray">Create a new account</p>
         </div>
 
         {error && (

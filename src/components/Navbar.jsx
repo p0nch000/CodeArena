@@ -1,14 +1,14 @@
 "use client";
 import Link from 'next/link';
-import { usePathname } from 'next/navigation'; // Cambia a usePathname de next/navigation
+import { usePathname } from 'next/navigation'; 
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '@/core/context/AuthContext';
 
 const navigation = [
   { name: 'Home', href: '/home' },
   { name: 'Code Challenges', href: '/challenge' },
   { name: 'Leaderboard', href: '/leaderboard' },
-  { name: 'Dashboard', href: '/dashboard' },
 ];
 
 function classNames(...classes) {
@@ -16,7 +16,11 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
-  const pathname = usePathname(); // Obtén la ruta actual
+  const pathname = usePathname(); 
+  const { user } = useAuth();
+  const navItems = user?.role === 'admin' 
+    ? [...navigation, { name: 'Dashboard', href: '/dashboard' }]
+    : navigation;
 
   return (
     <Disclosure as="nav" className="bg-black">
@@ -38,7 +42,7 @@ export default function Navbar() {
             <div className="absolute left-0 flex items-center">
             <Link href="/home" className="flex items-center">
               <img
-                src="/CodeArenaLogoNoText.png" // ← Pon aquí la URL de tu logo
+                src="/CodeArenaLogoNoText.png"
               alt="Company Logo"
               className="h-6 w-7"
               />
@@ -51,7 +55,7 @@ export default function Navbar() {
             {/* Menú navegación */}
             <div className="hidden sm:block font-mono">
               <div className="flex space-x-16">
-                {navigation.map((item) => (
+                {navItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
@@ -89,7 +93,7 @@ export default function Navbar() {
       {/* Menú móvil */}
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          {navigation.map((item) => (
+          {navItems.map((item) => (
             <DisclosureButton
               key={item.name}
               as="a"

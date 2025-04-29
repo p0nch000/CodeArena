@@ -3,6 +3,7 @@ import "./globals.css";
 
 // Import HeroUIProvider
 import { HeroUIProvider } from "@heroui/react";
+import { AuthProvider } from '@/core/context/AuthContext';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,9 +43,11 @@ export default function RootLayout({ children }) {
       >
         {/* Wrap the app with HeroUIProvider */}
         <HeroUIProvider>
-          <main className="dark">
-            {children}
-          </main>
+          <AuthProvider>
+            <main className="dark">
+              {children}
+            </main>
+          </AuthProvider>
         </HeroUIProvider>
       </body>
     </html>

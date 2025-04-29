@@ -5,9 +5,11 @@ import { FaUser, FaLock } from 'react-icons/fa'
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useAuth } from '@/core/context/AuthContext'
 
 export default function LoginForm() {
   const router = useRouter()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -28,6 +30,7 @@ export default function LoginForm() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
+        credentials: 'include'
       })
 
       const data = await response.json()
@@ -35,7 +38,11 @@ export default function LoginForm() {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to login')
       }
-      router.push('/dashboard') 
+
+      // Update auth context
+      login(data.user)
+      
+      router.push('/home')
       router.refresh()
     } catch (error) {
       setError(error.message)
@@ -51,18 +58,18 @@ export default function LoginForm() {
       <div className="bg-[#1a202c] p-8 rounded-xl w-full max-w-[550px] flex flex-col gap-6">
         
         <div className="flex flex-col items-center gap-3">
-          <div className="relative w-40 h-20">
-            <Image
-              src="/code_arena_logo.png"
-              alt="Tech Mahindra Logo"
-              fill
-              className="object-contain w-full h-full"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative w-7 h-6">
+              <Image
+                src="/CodeArenaLogoNoText.png"
+                alt="CodeArena Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <span className="text-white font-mono text-xl tracking-tight">CodeArena</span>
           </div>
-          <div className="text-center">
-            {/* <h1 className="text-xl font-bold text-mahindra-white mb-1">CodeArena</h1> */}
-            <p className="text-sm text-mahindra-light-gray">Please enter your credentials</p>
-          </div>
+          <p className="text-sm text-mahindra-light-gray">Please enter your credentials</p>
         </div>
 
         {error && (
