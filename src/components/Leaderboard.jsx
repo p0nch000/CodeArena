@@ -9,8 +9,10 @@ import {
   TableCell,
   Chip,
   Spinner,
-  Avatar
+  Avatar,
+  Pagination
 } from "@nextui-org/react";
+import { useState } from "react";
 
 function getBadgeStyles(rank) {
   if (!rank) return {
@@ -57,10 +59,18 @@ function getRankBadgeImage(rank) {
   return null;
 }
 
-export default function Leaderboard({ users = [], isLoading = false }) {
+export default function Leaderboard({ 
+  users = [], 
+  isLoading = false,
+  showPagination = false,
+  onPageChange
+}) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 30;
+
   if (isLoading) {
     return (
-      <div className="w-full flex justify-center items-center py-12">
+      <div className="w-full flex justify-center items-center py-8">
         <Spinner size="lg" color="danger" />
       </div>
     );
@@ -68,14 +78,26 @@ export default function Leaderboard({ users = [], isLoading = false }) {
   
   if (!users || users.length === 0) {
     return (
-      <div className="w-full text-center py-8 text-gray-400">
+      <div className="w-full text-center py-6 text-gray-400">
         No users found matching your criteria
       </div>
     );
   }
 
+  const pages = Math.ceil(users.length / rowsPerPage);
+  const items = showPagination 
+    ? users.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+    : users;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    if (onPageChange) {
+      onPageChange(page);
+    }
+  };
+
   return (
-    <div className="w-full">
+    <div className="w-full mb-0 pb-0">
       <div className="w-full rounded-xl overflow-hidden shadow-md border border-zinc-800 bg-mahindra-dark-blue">
         <Table
           isStriped
@@ -83,8 +105,8 @@ export default function Leaderboard({ users = [], isLoading = false }) {
           aria-label="Leaderboard table"
           classNames={{
             table: "bg-mahindra-dark-blue text-white",
-            th: "text-xs font-bold text-zinc-300 bg-zinc-800/50 py-5 text-center uppercase tracking-wider",
-            td: "text-sm text-mahindra-light-gray py-4 text-center",
+            th: "text-xs font-bold text-zinc-300 bg-zinc-800/50 py-4 text-center uppercase tracking-wider",
+            td: "text-sm text-mahindra-light-gray py-3 text-center",
             tr: "border-b border-zinc-800/30 transition-colors",
           }}
         >
@@ -96,18 +118,19 @@ export default function Leaderboard({ users = [], isLoading = false }) {
             <TableColumn>Badge</TableColumn>
           </TableHeader>
           <TableBody>
-            {users.map((user, idx) => {
+            {items.map((user, idx) => {
               const { backgroundColor, textColor } = getBadgeStyles(user.rank);
               const rankBadgeImage = getRankBadgeImage(user.rank);
               const randomAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'user'}${user.id}`;
+              const globalRank = showPagination ? (currentPage - 1) * rowsPerPage + idx + 1 : idx + 1;
 
               return (
                 <TableRow 
                   key={user.id} 
-                  className="group cursor-pointer"
+                  className="group cursor-pointer hover:bg-red-500/10"
                 >
-                  <TableCell className="text-red-400 font-semibold group-hover:bg-red-500/10">#{idx + 1}</TableCell>
-                  <TableCell className="group-hover:bg-red-500/10">
+                  <TableCell className="text-red-400 font-semibold group-hover:text-red-300">#{globalRank}</TableCell>
+                  <TableCell>
                     <div className="flex items-center justify-center space-x-2">
                       <Avatar
                         src={user.avatarUrl || randomAvatar}
@@ -117,9 +140,9 @@ export default function Leaderboard({ users = [], isLoading = false }) {
                       <span className="text-mahindra-white font-medium">{user.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="group-hover:bg-red-500/10">{user.challenges}</TableCell>
-                  <TableCell className="group-hover:bg-red-500/10">{user.points.toLocaleString()}</TableCell>
-                  <TableCell className="group-hover:bg-red-500/10">
+                  <TableCell>{user.challenges}</TableCell>
+                  <TableCell>{user.points.toLocaleString()}</TableCell>
+                  <TableCell>
                     <div className="flex justify-center items-center space-x-2">
                       {rankBadgeImage && (
                         <img 
@@ -153,6 +176,24 @@ export default function Leaderboard({ users = [], isLoading = false }) {
           </TableBody>
         </Table>
       </div>
+
+      {showPagination && pages > 1 && (
+        <div className="flex justify-center mt-2 pb-0 mb-0">
+          <Pagination
+            total={pages}
+            initialPage={1}
+            page={currentPage}
+            onChange={handlePageChange}
+            classNames={{
+              wrapper: "gap-1 overflow-visible rounded",
+              item: "w-8 h-8 text-small rounded-md bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
+              cursor: "bg-mahindra-red text-white font-bold shadow-md",
+              next: "bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
+              prev: "bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

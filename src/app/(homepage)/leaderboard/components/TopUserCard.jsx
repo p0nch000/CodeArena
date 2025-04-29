@@ -40,8 +40,20 @@ export default function TopUserCard({ user, podiumPosition, featured = false }) 
       
       return null;
     };
+
+    const getPodiumFrame = (position) => {
+      switch (position) {
+        case "first":
+          return "border-yellow-500/70 shadow-yellow-500/30 shadow-lg from-red-600/30 to-red-900/50";
+        case "second":
+          return "border-gray-400/70 shadow-gray-400/30 shadow-md from-red-600/20 to-red-900/40";
+        case "third":
+          return "border-amber-700/70 shadow-amber-700/30 shadow-md from-red-600/20 to-red-900/40";
+        default:
+          return "border-gray-500/30 from-gray-600/20 to-gray-900/30";
+      }
+    };
   
-    // Verificar que user y sus propiedades existan
     if (!user) {
       return (
         <div className="bg-gray-800/50 rounded-xl p-8 text-center text-gray-400 h-full flex items-center justify-center">
@@ -50,20 +62,14 @@ export default function TopUserCard({ user, podiumPosition, featured = false }) 
       );
     }
   
-    // Colores según posición
-    const borderColor = podiumPosition === "first" 
-      ? "border-yellow-500/60" 
-      : podiumPosition === "second" 
-        ? "border-gray-400/60" 
-        : "border-amber-700/60";
-    
     const rankColors = getRankColors(user.rank);
     const rankBadgeImage = getRankBadgeImage(user.rank);
     const position = user.position || 0;
     const randomAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'user'}${user.id}`;
+    const podiumFrame = getPodiumFrame(podiumPosition);
     
     return (
-      <div className={`relative flex flex-col items-center bg-gradient-to-b ${rankColors} rounded-xl p-6 border-2 ${borderColor} transition-all duration-300 hover:shadow-lg hover:shadow-${podiumPosition === "first" ? "yellow" : podiumPosition === "second" ? "gray" : "amber"}-500/20`}>
+      <div className={`relative flex flex-col items-center bg-gradient-to-b ${podiumFrame} rounded-xl p-6 border-2 transition-all duration-300 hover:shadow-lg hover:scale-105`}>
         <div className="absolute top-3 right-3 text-xl">
           {user.badge || ''}
         </div>
@@ -73,7 +79,7 @@ export default function TopUserCard({ user, podiumPosition, featured = false }) 
         </div>
         
         <div className="relative mb-4">
-          <div className={`${podiumPosition === "first" ? "w-24 h-24" : "w-20 h-20"} rounded-full bg-gray-800 overflow-hidden border-2 ${borderColor} shadow-lg`}>
+          <div className={`${podiumPosition === "first" ? "w-24 h-24" : "w-20 h-20"} rounded-full bg-gray-800 overflow-hidden border-2 ${podiumFrame} shadow-lg`}>
             <img 
               src={randomAvatar} 
               alt={user.name} 
@@ -100,7 +106,7 @@ export default function TopUserCard({ user, podiumPosition, featured = false }) 
           )}
         </div>
         
-        <h3 className={`${podiumPosition === "first" ? "text-xl" : "text-lg"} font-bold text-white mb-2 text-center`}>
+        <h3 className={`${podiumPosition === "first" ? "text-xl" : "text-lg"} font-bold text-white mb-2 text-center truncate max-w-full`}>
           {user.name || 'User'}
         </h3>
         

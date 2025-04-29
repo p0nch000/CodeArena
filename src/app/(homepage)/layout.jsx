@@ -16,13 +16,13 @@ export default function RootLayout({ children }) {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="scale-90 origin-top">
+      <main className="scale-90 origin-top flex-grow transform-gpu">
         {children}
       </main>
       <Footer />
-    </>
+    </div>
   )
 }
   

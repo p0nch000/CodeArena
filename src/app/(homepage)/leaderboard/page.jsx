@@ -15,6 +15,7 @@ export default function LeaderboardPage() {
   const [topUsers, setTopUsers] = useState([]);
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   
   const challengesOptions = [
     { value: "desc", label: "Challenges: High to Low" },
@@ -39,7 +40,7 @@ export default function LeaderboardPage() {
   useEffect(() => {
     const fetchTopUsers = async () => {
       try {
-        const response = await fetch('/api/leaderboard/top');
+        const response = await fetch(`/api/leaderboard/top?rank=${rankFilter}`);
         const data = await response.json();
         
         if (data.success) {
@@ -51,7 +52,7 @@ export default function LeaderboardPage() {
     };
     
     fetchTopUsers();
-  }, []);
+  }, [rankFilter]);
   
   useEffect(() => {
     const fetchLeaderboardData = async () => {
@@ -61,7 +62,8 @@ export default function LeaderboardPage() {
           challengesOrder,
           pointsOrder,
           rankFilter,
-          searchQuery
+          searchQuery,
+          page: currentPage
         });
         
         const response = await fetch(`/api/leaderboard/filtered?${queryParams}`);
@@ -78,19 +80,19 @@ export default function LeaderboardPage() {
     };
     
     fetchLeaderboardData();
-  }, [challengesOrder, pointsOrder, rankFilter, searchQuery]);
+  }, [challengesOrder, pointsOrder, rankFilter, searchQuery, currentPage]);
   
   const getPodiumUser = (position) => {
     return topUsers.find(user => user.position === position);
   };
 
   return (
-    <div className="flex flex-col w-full px-8 py-6 max-w-screen-2xl mx-auto font-mono">
-      <div className="flex justify-between items-center mb-8">
+    <div className="flex flex-col w-full px-6 py-4 pb-0 max-w-screen-2xl mx-auto font-mono">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold text-white">Leaderboard</h1>
       </div>
       
-      <div className="mb-8 bg-gray-800/30 rounded-xl p-6 border border-gray-700/50">
+      <div className="mb-4 bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
         <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
           <div className="relative flex-grow">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -157,7 +159,7 @@ export default function LeaderboardPage() {
       </div>
       
       {topUsers.length > 0 && (
-        <div className="mb-12">
+        <div className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
             <div className="flex items-end justify-center order-2 md:order-1">
               <div className="w-full max-w-xs transform translate-y-4 md:translate-y-0">
@@ -190,14 +192,12 @@ export default function LeaderboardPage() {
         </div>
       )}
       
-      <div className="flex-1">
+      <div className="mb-0 pb-0">
         <Leaderboard 
           users={leaderboardData}
           isLoading={isLoading}
-          challengesOrder={challengesOrder}
-          pointsOrder={pointsOrder}
-          rankFilter={rankFilter}
-          searchQuery={searchQuery}
+          showPagination={true}
+          onPageChange={setCurrentPage}
         />
       </div>
     </div>
