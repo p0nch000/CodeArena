@@ -1,3 +1,5 @@
+import { generateAvatar } from "@/utils/avatar";
+
 export default function TopUserCard({ user, podiumPosition, featured = false }) {
     const getRankColors = (rank) => {
       if (!rank) return 'from-gray-600/20 to-gray-900/30 border-gray-500/30 text-gray-400';
@@ -65,7 +67,6 @@ export default function TopUserCard({ user, podiumPosition, featured = false }) 
     const rankColors = getRankColors(user.rank);
     const rankBadgeImage = getRankBadgeImage(user.rank);
     const position = user.position || 0;
-    const randomAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'user'}${user.id}`;
     const podiumFrame = getPodiumFrame(podiumPosition);
     
     return (
@@ -81,9 +82,11 @@ export default function TopUserCard({ user, podiumPosition, featured = false }) 
         <div className="relative mb-4">
           <div className={`${podiumPosition === "first" ? "w-24 h-24" : "w-20 h-20"} rounded-full bg-gray-800 overflow-hidden border-2 ${podiumFrame} shadow-lg`}>
             <img 
-              src={randomAvatar} 
+              src={user.avatarUrl || generateAvatar(user)} 
               alt={user.name} 
               className="w-full h-full object-cover"
+              loading="eager"
+              crossOrigin="anonymous"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`;

@@ -5,7 +5,6 @@ import Dropdown from "@/components/Dropdown";
 import TopUserCard from "./components/TopUserCard";
 import Leaderboard from "@/components/Leaderboard";
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { TrophyIcon } from '@heroicons/react/24/solid';
 
 export default function LeaderboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -88,11 +87,11 @@ export default function LeaderboardPage() {
 
   return (
     <div className="flex flex-col w-full px-6 py-4 pb-0 max-w-screen-2xl mx-auto font-mono">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-white">Leaderboard</h1>
       </div>
       
-      <div className="mb-4 bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+      <div className="mb-8 bg-gray-800/30 rounded-xl p-5 border border-gray-700/50">
         <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
           <div className="relative flex-grow">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -159,7 +158,7 @@ export default function LeaderboardPage() {
       </div>
       
       {topUsers.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
             <div className="flex items-end justify-center order-2 md:order-1">
               <div className="w-full max-w-xs transform translate-y-4 md:translate-y-0">

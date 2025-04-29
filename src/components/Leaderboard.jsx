@@ -13,6 +13,7 @@ import {
   Pagination
 } from "@nextui-org/react";
 import { useState } from "react";
+import { generateAvatar } from "@/utils/avatar";
 
 function getBadgeStyles(rank) {
   if (!rank) return {
@@ -70,7 +71,7 @@ export default function Leaderboard({
 
   if (isLoading) {
     return (
-      <div className="w-full flex justify-center items-center py-8">
+      <div className="w-full flex justify-center items-center py-12">
         <Spinner size="lg" color="danger" />
       </div>
     );
@@ -78,7 +79,7 @@ export default function Leaderboard({
   
   if (!users || users.length === 0) {
     return (
-      <div className="w-full text-center py-6 text-gray-400">
+      <div className="w-full text-center py-10 text-gray-400">
         No users found matching your criteria
       </div>
     );
@@ -105,8 +106,8 @@ export default function Leaderboard({
           aria-label="Leaderboard table"
           classNames={{
             table: "bg-mahindra-dark-blue text-white",
-            th: "text-xs font-bold text-zinc-300 bg-zinc-800/50 py-4 text-center uppercase tracking-wider",
-            td: "text-sm text-mahindra-light-gray py-3 text-center",
+            th: "text-xs font-bold text-zinc-300 bg-zinc-800/50 py-5 text-center uppercase tracking-wider",
+            td: "text-sm text-mahindra-light-gray py-5 text-center",
             tr: "border-b border-zinc-800/30 transition-colors",
           }}
         >
@@ -121,7 +122,6 @@ export default function Leaderboard({
             {items.map((user, idx) => {
               const { backgroundColor, textColor } = getBadgeStyles(user.rank);
               const rankBadgeImage = getRankBadgeImage(user.rank);
-              const randomAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'user'}${user.id}`;
               const globalRank = showPagination ? (currentPage - 1) * rowsPerPage + idx + 1 : idx + 1;
 
               return (
@@ -133,8 +133,10 @@ export default function Leaderboard({
                   <TableCell>
                     <div className="flex items-center justify-center space-x-2">
                       <Avatar
-                        src={user.avatarUrl || randomAvatar}
+                        src={user.avatarUrl || generateAvatar(user)}
                         size="sm"
+                        isBordered
+                        color="danger"
                         className="mr-2"
                       />
                       <span className="text-mahindra-white font-medium">{user.name}</span>
@@ -178,15 +180,16 @@ export default function Leaderboard({
       </div>
 
       {showPagination && pages > 1 && (
-        <div className="flex justify-center mt-2 pb-0 mb-0">
+        <div className="flex justify-center mt-8 mb-10">
           <Pagination
             total={pages}
             initialPage={1}
             page={currentPage}
             onChange={handlePageChange}
+            size="lg"
             classNames={{
-              wrapper: "gap-1 overflow-visible rounded",
-              item: "w-8 h-8 text-small rounded-md bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
+              wrapper: "gap-2 overflow-visible rounded",
+              item: "w-10 h-10 text-md rounded-md bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
               cursor: "bg-mahindra-red text-white font-bold shadow-md",
               next: "bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
               prev: "bg-gray-800/50 text-gray-300 hover:bg-red-500/20",

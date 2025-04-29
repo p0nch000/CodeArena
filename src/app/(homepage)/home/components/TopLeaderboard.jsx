@@ -1,6 +1,7 @@
 "use client";
 
 import { Chip } from "@nextui-org/react";
+import { generateAvatar } from "@/utils/avatar";
 
 function getBadgeStyles(rank) {
   if (!rank) return {
@@ -72,7 +73,6 @@ export function TopLeaderboard({ topUsers = [] }) {
           {topUsers.map((user, idx) => {
             const { backgroundColor, textColor } = getBadgeStyles(user.rank);
             const rankBadgeImage = getRankBadgeImage(user.rank);
-            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'user'}${user.id}`;
             
             // Determine the medal for top positions
             let medal = null;
@@ -93,11 +93,13 @@ export function TopLeaderboard({ topUsers = [] }) {
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full overflow-hidden mr-3 bg-gray-800 flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full overflow-hidden mr-3 bg-gray-800 flex-shrink-0 border border-red-500/50">
                       <img 
-                        src={avatarUrl} 
+                        src={user.avatarUrl || generateAvatar(user)} 
                         alt={user.name} 
                         className="w-full h-full object-cover"
+                        loading="eager"
+                        crossOrigin="anonymous"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`;

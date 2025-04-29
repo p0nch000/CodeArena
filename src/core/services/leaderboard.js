@@ -49,7 +49,8 @@ class Leaderboard {
           rank: user.ranks?.name || 'Unranked',
           rankIcon: user.ranks?.icon_url || null,
           points: user.points,
-          challenges: completedChallenges
+          challenges: completedChallenges,
+          avatarUrl: user.avatar_url || null
         };
       });
 
@@ -67,9 +68,20 @@ class Leaderboard {
     }
   }
 
-  async getTopUsers(limit = 3) {
+  async getTopUsers(limit = 3, rankFilter = 'all') {
     try {
+      const whereClause = {};
+      if (rankFilter !== 'all') {
+        whereClause.ranks = {
+          name: {
+            equals: rankFilter,
+            mode: 'insensitive'
+          }
+        };
+      }
+
       const topUsers = await prisma.users.findMany({
+        where: whereClause,
         take: limit,
         orderBy: {
           points: 'desc'
@@ -93,7 +105,7 @@ class Leaderboard {
         name: user.username,
         rank: user.ranks?.name || 'Unranked',
         points: user.points,
-        avatarUrl: '/avatars/default.jpg',
+        avatarUrl: user.avatar_url || null,
         position: index + 1,
         badge: index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉',
         challenges: user.submissions.length
