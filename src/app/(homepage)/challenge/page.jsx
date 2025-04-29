@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CodeChallengeFull } from "./components";
 import Dropdown from "../../../components/Dropdown";
 
@@ -15,11 +15,9 @@ export default function Challenge() {
     const difficultyOptions = ["all", "easy", "medium", "hard"];
 
     // Function to fetch filtered challenges
-    const fetchFilteredChallenges = async () => {
+    const fetchFilteredChallenges = useCallback(async () => {
         setLoading(true);
         try {
-
-                
             const response = await fetch(
                 `/api/challenges/filtered?difficulty=${difficultyFilter}`
             );
@@ -38,7 +36,7 @@ export default function Challenge() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [difficultyFilter]);
         
     // Apply filters function
     const applyFilters = () => {
@@ -48,13 +46,13 @@ export default function Challenge() {
     // Load challenges when component mounts
     useEffect(() => {
         fetchFilteredChallenges();
-    }, []);
+    }, [fetchFilteredChallenges]);
     
     return (
         <div className="flex flex-col h-[calc(100vh-120px)] w-full px-8 py-4 max-w-screen-2xl mx-auto font-mono">
-          {/* Page Title - Reduced padding */}
+          {/* Page Title - Updated size to match leaderboard */}
           <div className="py-2 px-2 mb-2">
-            <h1 className="text-4xl font-bold text-white">Code Challenges</h1>
+            <h1 className="text-3xl font-bold text-white">Code Challenges</h1>
           </div>
           
           {/* Main content with filters and challenges - Configurable overflow */}
@@ -75,6 +73,7 @@ export default function Challenge() {
               
               {/* Apply filters button */}
               <button 
+                type="button"
                 onClick={applyFilters}
                 className="w-full bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-3 rounded-md text-sm font-medium transition-colors"
               >

@@ -1,10 +1,8 @@
 'use client'
 
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
 import { useAuthRedirect } from '@/core/hooks/useAuthRedirect'
 
-export default function RootLayout({ children }) {
+export default function ProtectedLayout({ children }) {
   const { loading } = useAuthRedirect()
 
   if (loading) {
@@ -15,14 +13,5 @@ export default function RootLayout({ children }) {
     )
   }
 
-  return (
-    <>
-      <Navbar />
-      <main className="scale-90 origin-top">
-        {children}
-      </main>
-      <Footer />
-    </>
-  )
-}
-  
+  return children
+} 
