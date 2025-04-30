@@ -58,8 +58,8 @@ export default function LeaderboardPage() {
       setIsLoading(true);
       try {
         const queryParams = new URLSearchParams({
-          challengesOrder,
           pointsOrder,
+          challengesOrder,
           rankFilter,
           searchQuery,
           page: currentPage
@@ -86,77 +86,12 @@ export default function LeaderboardPage() {
   };
 
   return (
+
     <div className="flex flex-col w-full px-6 py-4 pb-0 max-w-screen-2xl mx-auto font-mono">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-white">Leaderboard</h1>
       </div>
-      
-      <div className="mb-8 bg-gray-800/30 rounded-xl p-5 border border-gray-700/50">
-        <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-              <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
-            </div>
-            <input
-              id="search-players"
-              type="search"
-              placeholder="Search players by username..."
-              className="block w-full pl-12 pr-4 py-3 text-base bg-gray-900/50 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-white"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search players"
-            />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="w-full">
-            <div className="block text-sm font-medium text-gray-400 mb-2">Challenges</div>
-            <Dropdown
-              options={challengesOptions.map(opt => opt.label)}
-              value={challengesOptions.find(opt => opt.value === challengesOrder)?.label}
-              onChange={(value) => {
-                const option = challengesOptions.find(opt => opt.label === value);
-                setChallengesOrder(option?.value || "desc");
-              }}
-              label=""
-              className="w-full"
-              aria-label="Sort by challenges"
-            />
-          </div>
-          
-          <div className="w-full">
-            <div className="block text-sm font-medium text-gray-400 mb-2">Points</div>
-            <Dropdown
-              options={pointsOptions.map(opt => opt.label)}
-              value={pointsOptions.find(opt => opt.value === pointsOrder)?.label}
-              onChange={(value) => {
-                const option = pointsOptions.find(opt => opt.label === value);
-                setPointsOrder(option?.value || "desc");
-              }}
-              label=""
-              className="w-full"
-              aria-label="Sort by points"
-            />
-          </div>
-          
-          <div className="w-full">
-            <div className="block text-sm font-medium text-gray-400 mb-2">Rank</div>
-            <Dropdown
-              options={rankOptions.map(opt => opt.label)}
-              value={rankOptions.find(opt => opt.value === rankFilter)?.label}
-              onChange={(value) => {
-                const option = rankOptions.find(opt => opt.label === value);
-                setRankFilter(option?.value || "all");
-              }}
-              label=""
-              className="w-full"
-              aria-label="Filter by rank"
-            />
-          </div>
-        </div>
-      </div>
-      
       {topUsers.length > 0 && (
         <div className="mb-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
@@ -190,6 +125,72 @@ export default function LeaderboardPage() {
           </div>
         </div>
       )}
+      
+      <div className="mb-8 bg-gray-800/30 rounded-xl p-5 border border-gray-700/50">
+        <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
+          <div className="relative flex-grow">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+              <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+            </div>
+            <input
+              id="search-players"
+              type="search"
+              placeholder="Search players by username..."
+              className="block w-full pl-12 pr-4 py-3 text-base bg-gray-900/50 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-white"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search players"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="w-full">
+            <div className="block text-sm font-medium text-gray-400 mb-2">Points</div>
+            <Dropdown
+              options={pointsOptions.map(opt => opt.label)}
+              value={pointsOptions.find(opt => opt.value === pointsOrder)?.label}
+              onChange={(value) => {
+                const option = pointsOptions.find(opt => opt.label === value);
+                setPointsOrder(option?.value || "desc");
+              }}
+              label=""
+              className="w-full"
+              aria-label="Sort by points"
+            />
+          </div>
+          
+          <div className="w-full">
+            <div className="block text-sm font-medium text-gray-400 mb-2">Challenges</div>
+            <Dropdown
+              options={challengesOptions.map(opt => opt.label)}
+              value={challengesOptions.find(opt => opt.value === challengesOrder)?.label}
+              onChange={(value) => {
+                const option = challengesOptions.find(opt => opt.label === value);
+                setChallengesOrder(option?.value || "desc");
+              }}
+              label=""
+              className="w-full"
+              aria-label="Sort by challenges"
+            />
+          </div>
+          
+          <div className="w-full">
+            <div className="block text-sm font-medium text-gray-400 mb-2">Rank</div>
+            <Dropdown
+              options={rankOptions.map(opt => opt.label)}
+              value={rankOptions.find(opt => opt.value === rankFilter)?.label}
+              onChange={(value) => {
+                const option = rankOptions.find(opt => opt.label === value);
+                setRankFilter(option?.value || "all");
+              }}
+              label=""
+              className="w-full"
+              aria-label="Filter by rank"
+            />
+          </div>
+        </div>
+      </div>
       
       <div className="mb-0 pb-0">
         <Leaderboard 

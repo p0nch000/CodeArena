@@ -2,6 +2,8 @@ import { prisma } from '@/core/db/prisma';
 
 class User {
     async getUser(id){
+        if (!id) return null;
+        
         try {
             const user = await prisma.users.findUnique({
                 where: { id_user: id }
