@@ -9,7 +9,7 @@ CodeArena is a dynamic internal platform designed to enhance coding proficiency 
 - **AI-Powered Challenge System** delivering relevant coding problems tailored to skill levels
 - **Integrated Code Environment** providing real-time performance analytics
 - **Achievement Dashboard** to recognize technical excellence and improvement
-- **Administrative Analytics Portal** offering comprehensive metrics on team progress
+- **istrative Analytics Portal** offering comprehensive metrics on team progress
 - **Enterprise-Grade Security** ensuring data protection and integrity
 - **Cross-Platform Compatibility** supporting Windows, macOS, Linux, and major browsers
 

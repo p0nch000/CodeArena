@@ -26,7 +26,7 @@ export default function Navbar() {
   } : null;
 
   const navItems = user?.role === 'admin' 
-    ? [...navigation, { name: 'Dashboard', href: '/dashboard' }]
+    ? [...navigation, { name: 'Dashboard', href: '/admin/dashboard' }]
     : navigation;
 
   return (
