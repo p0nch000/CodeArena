@@ -8,8 +8,8 @@ export default function Footer() {
           {/* Logo a la izquierda */}
           <div className="flex items-center">
             <img
-              src="logoMTH.png" 
-              alt="Company Logo"
+              src="/logoMTH.png" 
+              alt="Company Logo" 
               className="h-10 w-auto"
             />
           </div>
