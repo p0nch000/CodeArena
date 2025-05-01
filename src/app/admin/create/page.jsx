@@ -1,8 +1,12 @@
+"use client";
+import { useState } from "react";
 import { Generator } from "./components";
 import { ActionButtons } from "./components";
 import { ChallengeGenerated } from "./components";
 
 export default function Create() {
+  const [challenge, setChallenge] = useState(null);
+
   return (
     <div className="flex flex-col w-full px-8 py-8 max-w-screen-2xl mx-auto font-mono">
       {/* Título y subtítulo */}
@@ -14,10 +18,10 @@ export default function Create() {
       {/* Contenedor de los componentes */}
       <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
         <div className="w-full bg-gray-900 rounded-xl p-6">
-          <Generator />
+          <Generator onGenerate={(generatedChallenge) => setChallenge(generatedChallenge)} />
         </div>
         <div className="w-full bg-gray-900 rounded-xl p-6">
-          <ChallengeGenerated />
+          <ChallengeGenerated challenge={challenge} />
         </div>
         <div className="w-full bg-gray-900 rounded-xl p-6 self-end">
           <ActionButtons />
