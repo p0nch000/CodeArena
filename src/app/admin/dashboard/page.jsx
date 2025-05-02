@@ -6,6 +6,7 @@ import MetricCard from "./components/MetricCard";
 import LanguageDistributionChart from "./components/LanguageDistributionChart";
 import SubmissionsAreaChart from './components/SubmissionsAreaChart';
 import { CodeBracketIcon, UsersIcon, DocumentTextIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import Link from "next/link";
 
 // Función formateadora para los valores del gráfico
 const valueFormatter = (item) => `${item.value}%`;
@@ -272,11 +273,19 @@ export default function AdminDashboard() {
       {/* Central container with limited width */}
       <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header with title and filters */}
-        <div className="border-l-4 border-red-500 pl-4 mb-6">
-          <h1 className="text-3xl font-bold text-white mb-1">Administrative Dashboard</h1>
-          <p className="text-gray-400 text-sm">
-            Real-time monitoring of key platform metrics
-          </p>
+        <div className="flex justify-between items-center mb-6">
+          <div className="border-l-4 border-red-500 pl-4">
+            <h1 className="text-3xl font-bold text-white mb-1">Administrative Dashboard</h1>
+            <p className="text-gray-400 text-sm">
+              Real-time monitoring of key platform metrics
+            </p>
+          </div>
+          <Link 
+            href="/admin/create"
+            className="bg-mahindra-red hover:bg-red-600 text-mahindra-white px-6 py-2 rounded-md text-sm font-medium transition-colors transform hover:scale-105"
+          >
+            Create Challenge
+          </Link>
         </div>
 
         {/* Filters and refresh button */}
