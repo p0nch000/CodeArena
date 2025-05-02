@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 require('dotenv').config();
 
-class DeepseekService {
+class Deepseek {
   constructor() {
     this.openai = new OpenAI({
       baseURL: 'https://api.deepseek.com',
@@ -11,34 +11,58 @@ class DeepseekService {
 
   async generateCodeChallenge(prompt) {
     try {
-      // Indicar al modelo que genere un desafío de codificación
-      // con la estructura JSON esperada
       const completion = await this.openai.chat.completions.create({
         messages: [
           { 
             role: "system", 
-            content: `You are a code challenge generator. Based on the difficulty provided by the user, generate a coding challenge with the following structure:
-            {
-              "title": "Challenge Title",
-              "description": "Detailed description of the challenge",
-              "examples": "Clear examples showing input and expected output",
-              "constraints": ["constraint 1", "constraint 2", "constraint 3"]
-            }
-            
-            Return ONLY valid JSON without additional text, code blocks, or formatting.` 
+            content: `You are an expert code challenge creator tasked with generating creative, unique, and educational coding problems.
+
+Your challenges should:
+1. Be original and avoid common/classic algorithm problems
+2. Be precisely defined with clear requirements
+3. Include detailed explanations and examples
+4. Provide appropriate difficulty-based constraints
+
+Based on the difficulty provided by the user, generate a coding challenge with this specific JSON structure:
+
+{
+  "title": "Descriptive, Unique Challenge Title",
+  "description": "Extensive detailed description that clearly explains the problem, including the precise task, input/output formats, edge cases, and any special considerations. Include 2-3 paragraphs of explanation.",
+  "examples": [
+    {
+      "input": "Example input format with specific values",
+      "output": "Expected output format with specific values",
+      "explanation": "Step-by-step explanation of how the output is derived from the input"
+    },
+    {
+      "input": "A different input example covering edge cases",
+      "output": "Expected output for the edge case",
+      "explanation": "Why this edge case produces this output"
+    }
+  ],
+  "constraints": [
+    "Specific input size limits (e.g., 1 ≤ n ≤ 10^5)",
+    "Time complexity requirements (e.g., O(n) expected)",
+    "Memory constraints (e.g., Maximum memory usage: 256MB)",
+    "Input format specifications",
+    "Any other relevant constraints"
+  ]
+}
+
+Tailor the challenge difficulty appropriately: 
+- Easy: Solvable with basic data structures and simple algorithms
+- Medium: Requires deeper algorithmic understanding and optimization
+- Hard: Involves complex algorithms, multiple optimization steps, or advanced concepts
+
+Return ONLY valid JSON without additional text, code blocks, or formatting.` 
           },
           { role: "user", content: prompt },
         ],
         model: "deepseek-chat",
       });
-  
-      // Obtener el contenido de la respuesta
       const content = completion.choices[0].message.content;
-  
-      // Parsear el contenido JSON
       let challenge;
       try {
-        // Extraer contenido JSON de la respuesta
         const jsonMatch = content.match(/```json\s*({[\s\S]*?})\s*```/) || 
                          content.match(/```\s*({[\s\S]*?})\s*```/) || 
                          content.match(/({[\s\S]*})/);
@@ -46,21 +70,16 @@ class DeepseekService {
         const jsonContent = jsonMatch ? jsonMatch[1] : content;
         challenge = JSON.parse(jsonContent.trim());
       } catch (jsonError) {
-        console.warn("La respuesta no es JSON, intentando procesar como texto plano...", jsonError);
-        
-        // Procesar como texto plano
+        console.warn("The response is not JSON, trying to process as plain text...", jsonError);
         challenge = this.parseChallengeFromText(content);
       }
-  
-      // Asegurarse de que el desafío tenga el formato correcto
       return this.ensureValidChallengeFormat(challenge);
     } catch (error) {
-      console.error("Error al generar el desafío de codificación:", error);
-      throw new Error("No se pudo generar el desafío de codificación");
+      console.error("Error generating the coding challenge:", error);
+      throw new Error("Failed to generate the coding challenge");
     }
   }
   
-  // Función para analizar el contenido de texto y extraer el desafío
   parseChallengeFromText(content) {
     const lines = content.split("\n");
     const challenge = {
@@ -70,13 +89,11 @@ class DeepseekService {
       constraints: []
     };
   
-    // Extraer el título - buscar encabezado con # o el patrón Title:
     const titleLine = lines.find(line => line.match(/^#\s+/) || line.match(/^Title:\s+/i));
     if (titleLine) {
       challenge.title = titleLine.replace(/^#\s+|^Title:\s+/i, "").trim();
     }
   
-    // Extraer secciones usando varios patrones de encabezado
     let currentSection = null;
     
     for (let i = 0; i < lines.length; i++) {
@@ -85,25 +102,29 @@ class DeepseekService {
       if (line.match(/^##?\s+Description/i) || line.match(/^Description:/i)) {
         currentSection = "description";
         continue;
-      } else if (line.match(/^##?\s+Examples?/i) || line.match(/^Examples?:/i)) {
+      } 
+      
+      if (line.match(/^##?\s+Examples?/i) || line.match(/^Examples?:/i)) {
         currentSection = "examples";
         continue;
-      } else if (line.match(/^##?\s+Constraints?/i) || line.match(/^Constraints?:/i)) {
+      } 
+      
+      if (line.match(/^##?\s+Constraints?/i) || line.match(/^Constraints?:/i)) {
         currentSection = "constraints";
         continue;
-      } else if (line.match(/^##?\s+/)) {
-        // Otra sección que no manejamos explícitamente
+      } 
+      
+      if (line.match(/^##?\s+/)) {
         currentSection = null;
         continue;
       }
       
       if (currentSection === "description") {
-        challenge.description += line + "\n";
+        challenge.description += `${line}\n`;
       } else if (currentSection === "examples") {
-        challenge.examples += line + "\n";
+        challenge.examples += `${line}\n`;
       } else if (currentSection === "constraints") {
         if (line.trim().length > 0) {
-          // Eliminar viñetas o numeración si están presentes
           const cleanedLine = line.replace(/^[-*•]|\d+[.)]\s*/, "").trim();
           if (cleanedLine) {
             challenge.constraints.push(cleanedLine);
@@ -111,13 +132,8 @@ class DeepseekService {
         }
       }
     }
-    
-    // Limpiar el texto
     challenge.description = challenge.description.trim();
     challenge.examples = challenge.examples.trim();
-    
-    // Si constraints sigue vacío pero tenemos texto en description,
-    // intentar extraer elementos numerados o con viñetas del final de la descripción
     if (challenge.constraints.length === 0 && challenge.description) {
       const constraintLines = challenge.description
         .split('\n')
@@ -133,47 +149,39 @@ class DeepseekService {
     return challenge;
   }
   
-  // Asegurarse de que el desafío tenga todos los campos requeridos en el formato esperado
   ensureValidChallengeFormat(challenge) {
     const validatedChallenge = {
       title: challenge.title || "Code Challenge",
-      description: challenge.description || "No se proporcionó descripción",
-      examples: challenge.examples || "No se proporcionaron ejemplos",
+      description: challenge.description || "No provided description",
+      examples: challenge.examples || "No provided examples",
       constraints: Array.isArray(challenge.constraints) ? 
         challenge.constraints : 
-        [challenge.constraints?.toString() || "No se proporcionaron restricciones"]
+        [challenge.constraints?.toString() || "No provided constraints"]
     };
     
-    // Asegurarse de que constraints siempre sea un array
     if (!Array.isArray(validatedChallenge.constraints) || validatedChallenge.constraints.length === 0) {
-      validatedChallenge.constraints = ["No hay restricciones específicas"];
+      validatedChallenge.constraints = ["No provided constraints"];
     }
-    
-    // Manejar estructuras complejas de ejemplos (especialmente para desafíos difíciles)
-    // Si examples es un objeto con la clave example/examples, extraerlo
+  
     if (typeof validatedChallenge.examples === 'object' && validatedChallenge.examples !== null) {
-      // Algunas respuestas podrían anidar ejemplos un nivel más profundo
       if (validatedChallenge.examples.example) {
         validatedChallenge.examples = validatedChallenge.examples.example;
       } else if (validatedChallenge.examples.examples) {
         validatedChallenge.examples = validatedChallenge.examples.examples;
       }
       
-      // No es necesario convertir a string aquí - el componente manejará formatos de objeto
     }
     
-    // Limpiar constraints si son cadenas con saltos de línea
     if (Array.isArray(validatedChallenge.constraints)) {
       validatedChallenge.constraints = validatedChallenge.constraints.map(constraint => {
         if (typeof constraint === 'string') {
           return constraint.trim();
         }
-        // Si constraint es un objeto, convertir a representación en string
         if (typeof constraint === 'object' && constraint !== null) {
           try {
             return JSON.stringify(constraint);
           } catch (e) {
-            return "Restricción compleja";
+            return "Complex constraint";
           }
         }
         return String(constraint);
@@ -184,4 +192,4 @@ class DeepseekService {
   }
 }
 
-export default new DeepseekService();
+export default new Deepseek();

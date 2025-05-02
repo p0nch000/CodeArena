@@ -1,9 +1,9 @@
-import DeepseekService from '@/core/services/deepseek';
+import Deepseek from '@/core/services/deepseek';
 
 export async function POST(req) {
   try {
     const { prompt } = await req.json(); // Obtén el prompt del cuerpo de la solicitud
-    const challenge = await DeepseekService.generateCodeChallenge(prompt);
+    const challenge = await Deepseek.generateCodeChallenge(prompt);
 
     return new Response(JSON.stringify({ challenge }), { status: 200 });
   } catch (error) {
