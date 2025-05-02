@@ -2,8 +2,8 @@ import { prisma } from '@/core/db/prisma';
 
 class Leaderboard {
   async getLeaderboard({
-    challengesOrder = 'desc',
-    pointsOrder = 'desc',
+    challengesOrder = null,
+    pointsOrder = null,
     rankFilter = 'all',
     searchQuery = ''
   }) {
@@ -17,14 +17,14 @@ class Leaderboard {
           }
         };
       }
-
+  
       if (searchQuery) {
         whereClause.username = {
           contains: searchQuery,
           mode: 'insensitive'
         };
       }
-
+  
       const users = await prisma.users.findMany({
         where: whereClause,
         include: {
@@ -37,30 +37,32 @@ class Leaderboard {
             }
           }
         },
-        orderBy: { points: pointsOrder }
+        orderBy: pointsOrder
+          ? { points: pointsOrder === 'asc' ? 'asc' : 'desc' }
+          : undefined
       });
-      
+  
       const processedUsers = users.map(user => {
         const completedChallenges = user.submissions.filter(sub => sub.is_correct).length;
-        
         return {
           id: user.id_user,
           name: user.username,
           rank: user.ranks?.name || 'Unranked',
           rankIcon: user.ranks?.icon_url || null,
-          points: user.points,
+          points: user.points ?? 0,
           challenges: completedChallenges,
           avatarUrl: user.avatar_url || null
         };
       });
-
-      if (challengesOrder) {
+  
+      if (challengesOrder && !pointsOrder) {
         processedUsers.sort((a, b) => {
-          return challengesOrder === 'desc' 
-            ? b.challenges - a.challenges 
+          return challengesOrder === 'desc'
+            ? b.challenges - a.challenges
             : a.challenges - b.challenges;
         });
       }
+  
       return processedUsers;
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
