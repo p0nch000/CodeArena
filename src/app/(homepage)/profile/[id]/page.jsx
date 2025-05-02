@@ -20,6 +20,25 @@ export default function ProfilePage({ params }) {
     const [activeTab, setActiveTab] = useState('overview');
     const [isCurrentUser, setIsCurrentUser] = useState(false);
 
+    // Match difficulty colors with CodeChallenge component
+    const difficultyColor = {
+        easy: "success",
+        medium: "warning",
+        hard: "danger"
+    };
+
+    const difficultyTextColors = {
+        easy: "text-emerald-400",
+        medium: "text-amber-400",
+        hard: "text-red-400"
+    };
+
+    const difficultyBgColors = {
+        easy: "bg-emerald-700/30",
+        medium: "bg-amber-700/30",
+        hard: "bg-red-700/30" 
+    };
+
     useEffect(() => {
         if (user) {
             setIsCurrentUser(userId === user.id);
@@ -67,12 +86,6 @@ export default function ProfilePage({ params }) {
             </div>
         );
     }
-
-    const difficultyColor = {
-        easy: 'success',
-        medium: 'warning',
-        hard: 'danger'
-    };
     
     const rankStyle = profile.rank ? getBadgeStyles(profile.rank.name) : getBadgeStyles(null);
     const rankBadgeImage = profile.rank ? getRankBadgeImage(profile.rank.name) : null;
@@ -80,7 +93,7 @@ export default function ProfilePage({ params }) {
     return (
         <div className="flex flex-col w-full px-6 py-5 max-w-7xl mx-auto font-mono">
             {/* Profile Header - Modern Card with Background Gradient */}
-            <div className="w-full bg-gradient-to-r from-mahindra-dark-blue to-mahindra-blue border border-gray-800 rounded-xl p-6 mb-8 shadow-lg">
+            <div className="w-full bg-mahindra-dark-blue border border-gray-800 rounded-xl p-6 mb-8 shadow-lg">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                     {/* Avatar */}
                     <div className="w-28 h-28 rounded-full ring-2 ring-mahindra-red ring-offset-2 ring-offset-mahindra-blue overflow-hidden">
@@ -181,8 +194,8 @@ export default function ProfilePage({ params }) {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="bg-mahindra-blue/30 p-4 rounded-lg">
                                     <div className="flex justify-between mb-2">
-                                        <span className="text-green-400 font-medium flex items-center">
-                                            <span className="h-2 w-2 rounded-full bg-green-400 mr-2" />
+                                        <span className="text-emerald-400 font-medium flex items-center">
+                                            <span className="h-2 w-2 rounded-full bg-emerald-400 mr-2" />
                                             Easy
                                         </span>
                                         <span className="text-mahindra-white">{profile.stats.byDifficulty.easy}</span>
@@ -191,8 +204,8 @@ export default function ProfilePage({ params }) {
                                 </div>
                                 <div className="bg-mahindra-blue/30 p-4 rounded-lg">
                                     <div className="flex justify-between mb-2">
-                                        <span className="text-yellow-400 font-medium flex items-center">
-                                            <span className="h-2 w-2 rounded-full bg-yellow-400 mr-2" />
+                                        <span className="text-amber-400 font-medium flex items-center">
+                                            <span className="h-2 w-2 rounded-full bg-amber-400 mr-2" />
                                             Medium
                                         </span>
                                         <span className="text-mahindra-white">{profile.stats.byDifficulty.medium}</span>
@@ -262,10 +275,9 @@ export default function ProfilePage({ params }) {
                                                 <TableCell className="text-mahindra-white font-medium">{submission.challenges.title}</TableCell>
                                                 <TableCell>
                                                     <Chip 
-                                                        color={difficultyColor[submission.challenges.difficulty.toLowerCase()]} 
+                                                        className={`${difficultyBgColors[submission.challenges.difficulty.toLowerCase()]} ${difficultyTextColors[submission.challenges.difficulty.toLowerCase()]} text-sm font-medium`}
                                                         size="sm" 
                                                         variant="flat"
-                                                        className="font-medium"
                                                     >
                                                         {submission.challenges.difficulty}
                                                     </Chip>
@@ -311,16 +323,15 @@ export default function ProfilePage({ params }) {
                             {challenges.map((challenge) => (
                                 <Card 
                                     key={challenge.id_challenge} 
-                                    className="bg-gradient-to-br from-mahindra-blue to-mahindra-dark-blue border border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
+                                    className="bg-mahindra-dark-blue border border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
                                     isPressable
                                 >
                                     <CardBody>
                                         <div className="flex justify-between items-start mb-3">
                                             <h4 className="text-lg font-semibold text-mahindra-white">{challenge.title}</h4>
                                             <Chip 
-                                                color={difficultyColor[challenge.difficulty.toLowerCase()]} 
+                                                className={`${difficultyBgColors[challenge.difficulty.toLowerCase()]} ${difficultyTextColors[challenge.difficulty.toLowerCase()]} text-sm font-medium`}
                                                 size="sm"
-                                                className="font-medium"
                                             >
                                                 {challenge.difficulty}
                                             </Chip>
@@ -386,25 +397,24 @@ export default function ProfilePage({ params }) {
                                         <TableCell className="text-mahindra-white font-medium">{submission.challenges.title}</TableCell>
                                         <TableCell>
                                             <Chip 
-                                                color={difficultyColor[submission.challenges.difficulty.toLowerCase()]} 
+                                                className={`${difficultyBgColors[submission.challenges.difficulty.toLowerCase()]} ${difficultyTextColors[submission.challenges.difficulty.toLowerCase()]} text-sm font-medium`}
                                                 size="sm" 
                                                 variant="flat"
-                                                className="font-medium"
                                             >
                                                 {submission.challenges.difficulty}
                                             </Chip>
                                         </TableCell>
                                         <TableCell>
-                                            <Chip 
-                                                startContent={submission.is_correct ? <FaCheck className="text-xs" /> : <FaTimes className="text-xs" />}
-                                                color={submission.is_correct ? "success" : "danger"} 
-                                                size="sm" 
-                                                variant="flat"
-                                                className="font-medium"
-                                            >
-                                                {submission.status}
-                                            </Chip>
-                                        </TableCell>
+                                                    <Chip 
+                                                        startContent={submission.is_correct ? <FaCheck className="text-xs" /> : <FaTimes className="text-xs" />}
+                                                        color={submission.is_correct ? "success" : "danger"} 
+                                                        size="sm" 
+                                                        variant="flat"
+                                                        className="font-medium"
+                                                    >
+                                                        {submission.status}
+                                                    </Chip>
+                                                </TableCell>
                                         <TableCell className="text-mahindra-white">{submission.programming_language}</TableCell>
                                         <TableCell className="text-gray-400 flex items-center">
                                             <FaClock className="mr-2 text-xs" />

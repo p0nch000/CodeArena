@@ -11,6 +11,8 @@ const seedTestCases = require('./seeders/seedTestCases')
 const seedSubmissions = require('./seeders/seedSubmissions')
 const seedSubmissionResults = require('./seeders/seedSubmissionResults')
 const seedUpdateUserRanks = require('./seeders/seedUpdateUserRanks')
+const seedAdminSubmissions = require('./seeders/seedAdminSubmissions')
+const seedAdminSubmissionResults = require('./seeders/seedAdminSubmissionResults')
 
 async function main() {
   await seedRanks(prisma)
@@ -21,6 +23,8 @@ async function main() {
   await seedSubmissions(prisma)
   await seedSubmissionResults(prisma)
   await seedUpdateUserRanks(prisma)
+  await seedAdminSubmissions(prisma)
+  await seedAdminSubmissionResults(prisma)
 }
 
 main()

@@ -7,27 +7,27 @@ module.exports = async function seedRanks(prisma) {
       },
       {
         name: 'Silver Developer',
-        min_points: 5,
+        min_points: 1000,
         icon_url: "/AssetSilverBadge.png"
       },
       {
         name: 'Gold Engineer',
-        min_points: 10,
+        min_points: 2000,
         icon_url: "/AssetGoldBadge.png"
       },
       {
         name: 'Platinum Architect',
-        min_points: 15,
+        min_points: 3000,
         icon_url: "/AssetPlatinumBadge.png"
       },
       {
         name: 'Diamond Debugger',
-        min_points: 20,
+        min_points: 4000,
         icon_url: "/AssetEliteBadge.png"
       },
       {
         name: 'Elite Codebreaker',
-        min_points: 30,
+        min_points: 5000,
         icon_url: "/AssetEliteBadge.png"
       }
     ];
