@@ -2,9 +2,20 @@ import { CodeChallenge } from "./components";
 import { FeaturedCodeChallenge } from "./components";
 import { TopLeaderboard } from "./components/TopLeaderboard";
 
+const getBaseUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  if (process.env.SITE_URL) {
+    return process.env.SITE_URL;
+  }
+  return 'http://localhost:3000';
+};
+
 async function getFeaturedChallenge() {
   try {
-    const response = await fetch(`${process.env.SITE_URL}/api/challenges/featured`, { 
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/challenges/featured`, { 
       cache: 'no-store' 
     });
     const data = await response.json();
@@ -17,7 +28,8 @@ async function getFeaturedChallenge() {
 
 async function getActiveChallenges() {
   try {
-    const response = await fetch(`${process.env.SITE_URL}/api/challenges`, { 
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/challenges`, { 
       cache: 'no-store' 
     });
     const data = await response.json();
@@ -30,7 +42,8 @@ async function getActiveChallenges() {
 
 async function getTopPerformers() {
   try {
-    const response = await fetch(`${process.env.SITE_URL}/api/leaderboard/top?limit=5`, {
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/leaderboard/top?limit=5`, {
       cache: 'no-store'
     });
     const data = await response.json();
