@@ -1,6 +1,27 @@
 import Link from 'next/link';
 
 export default function FeaturedCodeChallenge({ challenge }) {
+    // If no challenge is available, display a placeholder
+    if (!challenge) {
+        return (
+            <div className="w-full bg-mahindra-dark-blue rounded-xl p-6 font-mono text-mahindra-white">
+                <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="inline-block bg-mahindra-red/20 text-mahindra-red text-sm font-medium rounded-full px-4 py-1">
+                            Featured Challenge
+                        </div>
+                    </div>
+                    <h1 className="text-3xl font-bold text-mahindra-white mb-2">
+                        No featured challenge available
+                    </h1>
+                    <p className="text-mahindra-light-gray text-base max-w-3xl mb-4">
+                        Check back soon for new coding challenges.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full bg-mahindra-dark-blue rounded-xl p-6 font-mono text-mahindra-white transition-transform duration-300 hover:scale-[1.01] cursor-pointer">
             <div className="flex flex-col">

@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 require('dotenv').config();
 
-class Deepseek {
+class DeepSeek {
   constructor() {
     this.openai = new OpenAI({
       baseURL: 'https://api.deepseek.com',
@@ -192,4 +192,5 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
   }
 }
 
-export default new Deepseek();
+const deepseekService = new DeepSeek();
+export default deepseekService;

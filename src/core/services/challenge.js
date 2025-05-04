@@ -72,4 +72,5 @@ class Challenge {
 
 }
 
-export default new Challenge();
+const challengeService = new Challenge();
+export default challengeService;

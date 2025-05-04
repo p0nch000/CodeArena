@@ -97,4 +97,5 @@ class User {
     }
 }
 
-export default new User();
+const userService = new User();
+export default userService;

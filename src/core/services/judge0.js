@@ -177,4 +177,5 @@ class Judge0 {
   }
 }
 
-export default new Judge0();
+const judge0Service = new Judge0();
+export default judge0Service;
