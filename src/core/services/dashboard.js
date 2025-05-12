@@ -290,6 +290,62 @@ class Dashboard {
       throw error;
     }
   }
+
+  async getChallengeMetrics() {
+    try {
+      // Obtener retos con sus métricas y submissions
+      const challenges = await prisma.challenges.findMany({
+        select: {
+          id_challenge: true,
+          title: true,
+          difficulty: true,
+          submissions: {
+            select: {
+              id_submission: true,
+              is_correct: true,
+            }
+          },
+        },
+        where: {
+          published: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+      });
+  
+      // Calcular métricas para cada reto
+      const challengeMetrics = challenges.map(challenge => {
+        const totalSubmissions = challenge.submissions.length;
+        const correctSubmissions = challenge.submissions.filter(sub => sub.is_correct).length;
+        const successRate = totalSubmissions > 0 
+          ? Math.round((correctSubmissions / totalSubmissions) * 100) 
+          : 0;
+  
+        // Puntos promedio basados en dificultad
+        const avgPoints = 
+          challenge.difficulty === "Easy" ? 50 :
+          challenge.difficulty === "Medium" ? 100 : 150;
+  
+        return {
+          id: challenge.id_challenge,
+          name: challenge.title,
+          difficulty: challenge.difficulty,
+          submissions: totalSubmissions,
+          successRate: successRate,
+          points: avgPoints
+        };
+      });
+  
+      // Ordenar por número de submissions (descendente)
+      return challengeMetrics
+        .sort((a, b) => b.submissions - a.submissions)
+        .slice(0, 10); // Limitar a 10 retos
+    } catch (error) {
+      console.error("Error fetching challenge metrics:", error);
+      throw error;
+    }
+  }
 }
 
 const dashboardService = new Dashboard();

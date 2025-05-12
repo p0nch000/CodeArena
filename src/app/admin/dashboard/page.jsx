@@ -7,6 +7,8 @@ import LanguageDistributionChart from "./components/LanguageDistributionChart";
 import SubmissionsAreaChart from './components/SubmissionsAreaChart';
 import { CodeBracketIcon, UsersIcon, DocumentTextIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import Link from "next/link";
+import ChallengeMetricsTable from "./components/ChallengeMetricsTable";
+import Challenge from "@/app/(homepage)/challenge/page";
 
 // Función formateadora para los valores del gráfico
 const valueFormatter = (item) => `${item.value}%`;
@@ -46,6 +48,10 @@ export default function AdminDashboard() {
   const [successRateData, setSuccessRateData] = useState(null);
   const [loadingSuccessRate, setLoadingSuccessRate] = useState(true);
   const [successRateError, setSuccessRateError] = useState(null);
+
+  const [challengesTableData, setChallengesTableData] = useState([]);
+  const [loadingChallengesTable, setLoadingChallengesTable] = useState(true);
+  const [challengesTableError, setChallengesTableError] = useState(null);
   
   // Last updated timestamps
   const [lastUpdated, setLastUpdated] = useState(new Date());
@@ -181,6 +187,27 @@ export default function AdminDashboard() {
       setLastUpdated(new Date());
     }
   }
+
+  async function fetchChallengeMetricsData() {
+    setLoadingChallengesTable(true);
+    try {
+      const response = await fetch('/api/dashboard/challenge-metrics');
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch challenge metrics data');
+      }
+      
+      setChallengesTableData(data.data);
+      setChallengesTableError(null);
+    } catch (err) {
+      console.error('Error fetching challenge metrics data:', err);
+      setChallengesTableError(err.message);
+    } finally {
+      setLoadingChallengesTable(false);
+      setLastUpdated(new Date());
+    }
+  }
   
   // Refresh all dashboard data
   const refreshData = () => {
@@ -190,6 +217,7 @@ export default function AdminDashboard() {
     fetchLanguageDistribution();
     fetchSubmissionsChartData();
     fetchSuccessRateData();
+    fetchChallengeMetricsData(); 
   };
   
   // Load all data on component mount
@@ -200,39 +228,12 @@ export default function AdminDashboard() {
     fetchLanguageDistribution();
     fetchSubmissionsChartData();
     fetchSuccessRateData();
+    fetchChallengeMetricsData(); 
   }, []);
   
   // Check if any metric is still loading
-  const isAnyLoading = loadingChallenges || loadingUsers || loadingSubmissions || loadingLanguageDist || loadingSubmissionsChart || loadingSuccessRate;
+  const isAnyLoading = loadingChallenges || loadingUsers || loadingSubmissions || loadingLanguageDist || loadingSubmissionsChart || loadingSuccessRate || loadingChallengesTable;
   
-  // Sample data for the challenges table
-  const challengesTableData = [
-    {
-      id: 1,
-      name: "Binary Search Tree",
-      difficulty: "Medium",
-      submissions: 1234,
-      successRate: 68,
-      points: 85
-    },
-    {
-      id: 2,
-      name: "Array Rotation",
-      difficulty: "Easy",
-      submissions: 2567,
-      successRate: 89,
-      points: 45
-    },
-    {
-      id: 3,
-      name: "Dynamic Programming",
-      difficulty: "Hard",
-      submissions: 987,
-      successRate: 42,
-      points: 150
-    },
-  ];
-
   // Datos para la distribución de lenguajes
   const languageDistributionData = [
     { label: 'JavaScript', value: 35 },
@@ -315,6 +316,7 @@ export default function AdminDashboard() {
             {languageDistError && <p className="text-sm">Language Distribution: {languageDistError}</p>}
             {submissionsChartError && <p className="text-sm">Submissions Chart: {submissionsChartError}</p>}
             {successRateError && <p className="text-sm">Success Rate: {successRateError}</p>}
+            {challengesTableError && <p className="text-sm">Challenge Metrics: {challengesTableError}</p>}
           </div>
         )}
 
@@ -431,60 +433,17 @@ export default function AdminDashboard() {
         <div className="bg-gray-900/70 rounded-xl p-5 border border-gray-800 overflow-hidden mb-6">
           <h2 className="text-xl font-bold text-white mb-4">Challenge Metrics</h2>
           
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-gray-800/50 rounded-lg overflow-hidden">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Challenge Name
-                  </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Difficulty
-                  </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Submissions
-                  </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Success Rate
-                  </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Avg. Points
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {challengesTableData.map((challenge) => {
-                  // Determine color based on difficulty
-                  const difficultyColor = 
-                    challenge.difficulty === "Easy" ? "text-green-400 bg-green-900/30" :
-                    challenge.difficulty === "Medium" ? "text-yellow-400 bg-yellow-900/30" :
-                    "text-red-400 bg-red-900/30";
-                  
-                  return (
-                    <tr key={challenge.id} className="border-b border-gray-700 hover:bg-gray-700/30">
-                      <td className="py-3 px-4 text-sm text-white">
-                        {challenge.name}
-                      </td>
-                      <td className="py-2 px-4">
-                        <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${difficultyColor}`}>
-                          {challenge.difficulty}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-white">
-                        {challenge.submissions.toLocaleString()}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-white">
-                        {challenge.successRate}%
-                      </td>
-                      <td className="py-3 px-4 text-sm text-white">
-                        {challenge.points}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          {loadingChallengesTable ? (
+            <div className="h-40 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+            </div>
+          ) : challengesTableData && challengesTableData.length > 0 ? (
+            <ChallengeMetricsTable metrics={challengesTableData} />
+          ) : (
+            <div className="h-40 flex items-center justify-center text-gray-400">
+              No challenge metrics available
+            </div>
+          )}
         </div>
       </div>
     </div>
