@@ -2,8 +2,7 @@ import { prisma } from '@/core/db/prisma';
 
 class Leaderboard {
   async getLeaderboard({
-    challengesOrder = null,
-    pointsOrder = null,
+    sortBy = null,
     rankFilter = 'all',
     searchQuery = ''
   }) {
@@ -17,14 +16,25 @@ class Leaderboard {
           }
         };
       }
-  
+
       if (searchQuery) {
         whereClause.username = {
           contains: searchQuery,
           mode: 'insensitive'
         };
       }
-  
+
+      const orderBy = [];
+      if (sortBy) {
+        if (sortBy.startsWith('points')) {
+          orderBy.push({
+            points: sortBy === 'points_asc' ? 'asc' : 'desc'
+          });
+        } 
+      }
+
+      // Paginación
+      
       const users = await prisma.users.findMany({
         where: whereClause,
         include: {
@@ -37,11 +47,10 @@ class Leaderboard {
             }
           }
         },
-        orderBy: pointsOrder
-          ? { points: pointsOrder === 'asc' ? 'asc' : 'desc' }
-          : undefined
+        orderBy: orderBy.length ? orderBy : undefined,
       });
-  
+    
+
       const processedUsers = users.map(user => {
         const completedChallenges = user.submissions.filter(sub => sub.is_correct).length;
         return {
@@ -54,15 +63,15 @@ class Leaderboard {
           avatarUrl: user.avatar_url || null
         };
       });
-  
-      if (challengesOrder && !pointsOrder) {
-        processedUsers.sort((a, b) => {
-          return challengesOrder === 'desc'
+
+      if (sortBy?.startsWith('challenges')) {
+        processedUsers.sort((a, b) =>
+          sortBy === 'challenges_desc'
             ? b.challenges - a.challenges
-            : a.challenges - b.challenges;
-        });
+            : a.challenges - b.challenges
+        );
       }
-  
+
       return processedUsers;
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
@@ -102,16 +111,27 @@ class Leaderboard {
         }
       });
 
-      return topUsers.map((user, index) => ({
-        id: user.id_user,
-        name: user.username,
-        rank: user.ranks?.name || 'Unranked',
-        points: user.points,
-        avatarUrl: user.avatar_url || null,
-        position: index + 1,
-        badge: index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉',
-        challenges: user.submissions.length
-      }));
+      return topUsers.map((user, index) => {
+        let badge;
+        if (index === 0) {
+          badge = '🥇';
+        } else if (index === 1) {
+          badge = '🥈';
+        } else {
+          badge = '🥉';
+        }
+        return {
+          id: user.id_user,
+          name: user.username,
+          rank: user.ranks?.name || 'Unranked',
+          points: user.points,
+          avatarUrl: user.avatar_url || null,
+          position: index + 1,
+          badge: badge,
+          challenges: user.submissions.length
+        };
+      });
+
     } catch (error) {
       console.error("Error fetching top users:", error);
       return [];

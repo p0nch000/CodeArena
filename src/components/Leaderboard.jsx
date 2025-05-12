@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 import { generateAvatar } from "@/utils/avatar";
+import PropTypes from 'prop-types';
 
 function getBadgeStyles(rank) {
   if (!rank) return {
@@ -86,9 +87,7 @@ export default function Leaderboard({
   }
 
   const pages = Math.ceil(users.length / rowsPerPage);
-  const items = showPagination 
-    ? users.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-    : users;
+  const items = users;
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
