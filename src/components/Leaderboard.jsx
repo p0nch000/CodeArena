@@ -12,7 +12,7 @@ import {
   Avatar,
   Pagination
 } from "@nextui-org/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateAvatar } from "@/utils/avatar";
 import PropTypes from 'prop-types';
 
@@ -65,10 +65,17 @@ export default function Leaderboard({
   users = [], 
   isLoading = false,
   showPagination = false,
-  onPageChange
+  onPageChange,
+  totalPages = 1,
+  currentPage = 1
+
 }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 30;
+  const [internalPage, setInternalPage] = useState(currentPage);
+
+    // Actualizar el estado interno cuando cambia el prop
+    useEffect(() => {
+      setInternalPage(currentPage);
+    }, [currentPage]);
 
   if (isLoading) {
     return (
@@ -86,14 +93,16 @@ export default function Leaderboard({
     );
   }
 
-  const pages = Math.ceil(users.length / rowsPerPage);
-  const items = users;
-
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    setInternalPage(page);
     if (onPageChange) {
       onPageChange(page);
     }
+  };
+
+  // Función para calcular el ranking global correcto
+  const calculateGlobalRank = (idx) => {
+    return ((currentPage - 1) * 10) + idx + 1;
   };
 
   return (
@@ -118,10 +127,12 @@ export default function Leaderboard({
             <TableColumn>Badge</TableColumn>
           </TableHeader>
           <TableBody>
-            {items.map((user, idx) => {
+            {users.map((user, idx) => {
               const { backgroundColor, textColor } = getBadgeStyles(user.rank);
               const rankBadgeImage = getRankBadgeImage(user.rank);
-              const globalRank = showPagination ? (currentPage - 1) * rowsPerPage + idx + 1 : idx + 1;
+
+              // Calculate the global rank based on the current page and index
+              const globalRank = calculateGlobalRank(idx);
 
               return (
                 <TableRow 
@@ -178,12 +189,12 @@ export default function Leaderboard({
         </Table>
       </div>
 
-      {showPagination && pages > 1 && (
+      {showPagination && totalPages > 1 && (
         <div className="flex justify-center mt-8 mb-10">
           <Pagination
-            total={pages}
+            total={totalPages}
             initialPage={1}
-            page={currentPage}
+            page={internalPage}
             onChange={handlePageChange}
             size="lg"
             classNames={{

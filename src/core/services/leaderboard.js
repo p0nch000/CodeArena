@@ -5,6 +5,7 @@ class Leaderboard {
     sortBy = null,
     rankFilter = 'all',
     searchQuery = ''
+
   }) {
     try {
       const whereClause = {};
@@ -16,14 +17,14 @@ class Leaderboard {
           }
         };
       }
-
+  
       if (searchQuery) {
         whereClause.username = {
           contains: searchQuery,
           mode: 'insensitive'
         };
       }
-
+  
       const orderBy = [];
       if (sortBy) {
         if (sortBy.startsWith('points')) {
@@ -32,9 +33,8 @@ class Leaderboard {
           });
         } 
       }
-
-      // Paginación
-      
+  
+      // Eliminar paginación - traer todos los usuarios
       const users = await prisma.users.findMany({
         where: whereClause,
         include: {
@@ -47,10 +47,10 @@ class Leaderboard {
             }
           }
         },
-        orderBy: orderBy.length ? orderBy : undefined,
+        orderBy: orderBy.length ? orderBy : undefined
+        // Eliminar skip y take
       });
     
-
       const processedUsers = users.map(user => {
         const completedChallenges = user.submissions.filter(sub => sub.is_correct).length;
         return {
@@ -63,7 +63,7 @@ class Leaderboard {
           avatarUrl: user.avatar_url || null
         };
       });
-
+  
       if (sortBy?.startsWith('challenges')) {
         processedUsers.sort((a, b) =>
           sortBy === 'challenges_desc'
@@ -71,7 +71,7 @@ class Leaderboard {
             : a.challenges - b.challenges
         );
       }
-
+  
       return processedUsers;
     } catch (error) {
       console.error("Error fetching leaderboard:", error);

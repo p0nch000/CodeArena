@@ -4,27 +4,25 @@ import Leaderboard from '@/core/services/leaderboard';
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    console.log(searchParams.toString()); // Verifica los parámetros recibidos
-
-    const challengesOrder = searchParams.get('challengesOrder'); // puede ser null
-    const pointsOrder = searchParams.get('pointsOrder'); // puede ser null
+    
+    const challengesOrder = searchParams.get('challengesOrder');
+    const pointsOrder = searchParams.get('pointsOrder');
     const rankFilter = searchParams.get('rankFilter') || 'all';
     const searchQuery = searchParams.get('searchQuery') || '';
-
-    console.log({ challengesOrder, pointsOrder, rankFilter, searchQuery }); // Verifica los parámetros individuales
+    // Eliminar parámetros de paginación
 
     let sortBy = null;
 
     if (pointsOrder) {
-      sortBy = `points_${pointsOrder}`; // "points_desc" o "points_asc"
+      sortBy = `points_${pointsOrder}`;
     } else if (challengesOrder) {
-      sortBy = `challenges_${challengesOrder}`; // "challenges_desc" o "challenges_asc"
+      sortBy = `challenges_${challengesOrder}`;
     }
 
     const leaderboardData = await Leaderboard.getLeaderboard({
       sortBy,
       rankFilter,
-      searchQuery,
+      searchQuery
     });
 
     return NextResponse.json(
@@ -35,12 +33,13 @@ export async function GET(request) {
       { status: 200 }
     );
   } catch (error) {
+    console.error('API Error - Leaderboard filtered:', error);
     return NextResponse.json(
       { 
         success: false, 
         error: error.message 
       },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }

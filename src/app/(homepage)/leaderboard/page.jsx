@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Dropdown from "@/components/Dropdown";
 import TopUserCard from "./components/TopUserCard";
 import Leaderboard from "@/components/Leaderboard";
@@ -11,9 +11,11 @@ export default function LeaderboardPage() {
   const [sortOption, setSortOption] = useState("points_desc");
   const [rankFilter, setRankFilter] = useState("all");
   const [topUsers, setTopUsers] = useState([]);
-  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [allLeaderboardData, setAllLeaderboardData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const PAGE_SIZE = 10;
   
   const sortOptions = [
   { value: 'points_desc', label: 'Points: High to Low' },
@@ -36,6 +38,17 @@ export default function LeaderboardPage() {
   const pointsOrder = sortOption.startsWith("points") ? sortOption.split("_")[1] : undefined;
   const challengesOrder = sortOption.startsWith("challenges") ? sortOption.split("_")[1] : undefined;
 
+    // Cálculo de paginación en el frontend
+    const paginatedData = useMemo(() => {
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      return allLeaderboardData.slice(startIndex, endIndex);
+    }, [allLeaderboardData, currentPage, PAGE_SIZE]);
+    
+    // Cálculo del número total de páginas
+    const totalPages = useMemo(() => {
+      return Math.ceil(allLeaderboardData.length / PAGE_SIZE);
+    }, [allLeaderboardData, PAGE_SIZE]);
 
   useEffect(() => {
     const fetchTopUsers = async () => {
@@ -54,45 +67,43 @@ export default function LeaderboardPage() {
     fetchTopUsers();
   }, [rankFilter]);
   
+   
+  // Modificamos para cargar todos los datos
   useEffect(() => {
     const fetchLeaderboardData = async () => {
-    setIsLoading(true);
-    try {
-        console.log({
-          pointsOrder,
-          challengesOrder,
-          rankFilter,
-          searchQuery,
-          currentPage
+      setIsLoading(true);
+      try {
+        // Eliminar parámetros de paginación
+        const queryParams = new URLSearchParams({
+          ...(pointsOrder && { pointsOrder }),
+          ...(challengesOrder && { challengesOrder }),
+          rankFilter: rankFilter || 'all',
+          searchQuery: searchQuery || ''
         });
-      const queryParams = new URLSearchParams({
-        ...(pointsOrder && { pointsOrder }),
-        ...(challengesOrder && { challengesOrder }),
-        rankFilter,
-        searchQuery,
-        page: currentPage
-      });
-
-      const response = await fetch(`/api/leaderboard/filtered?${queryParams}`);
-      const data = await response.json();
-      
-      console.log(data); // Asegúrate de que la respuesta contiene los datos correctos
-
-      if (data.success) {
-        setLeaderboardData(data.leaderboardData);
-      }
-    } catch (error) {
-      console.error("Error fetching leaderboard data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  fetchLeaderboardData();
-}, [sortOption, rankFilter, searchQuery, currentPage]);
-
-
   
+        const response = await fetch(`/api/leaderboard/filtered?${queryParams}`);
+        if (!response.ok) {
+          throw new Error(`API returned ${response.status}: ${await response.text()}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          setAllLeaderboardData(data.leaderboardData);
+          setCurrentPage(1); // Resetear a la primera página cuando cambian los datos
+        } else {
+          throw new Error(data.error || 'Unknown error');
+        }
+      } catch (err) {
+        console.error("Error fetching leaderboard data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    fetchLeaderboardData();
+  }, [sortOption, rankFilter, searchQuery]); // Eliminar currentPage de las dependencias
+
   const getPodiumUser = (position) => {
     return topUsers.find(user => user.position === position);
   };
@@ -191,10 +202,12 @@ export default function LeaderboardPage() {
       
       <div className="mb-0 pb-0">
         <Leaderboard 
-          users={leaderboardData}
+          users={paginatedData} 
           isLoading={isLoading}
           showPagination={true}
           onPageChange={setCurrentPage}
+          totalPages={totalPages}
+          currentPage={currentPage} 
         />
       </div>
     </div>
