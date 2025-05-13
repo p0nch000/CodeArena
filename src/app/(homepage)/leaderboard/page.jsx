@@ -8,23 +8,20 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 export default function LeaderboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [challengesOrder, setChallengesOrder] = useState("desc");
-  const [pointsOrder, setPointsOrder] = useState("desc");
+  const [sortOption, setSortOption] = useState("points_desc");
   const [rankFilter, setRankFilter] = useState("all");
   const [topUsers, setTopUsers] = useState([]);
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   
-  const challengesOptions = [
-    { value: "desc", label: "Challenges: High to Low" },
-    { value: "asc", label: "Challenges: Low to High" },
+  const sortOptions = [
+  { value: 'points_desc', label: 'Points: High to Low' },
+  { value: 'points_asc', label: 'Points: Low to High' },
+  { value: 'challenges_desc', label: 'Challenges: High to Low' },
+  { value: 'challenges_asc', label: 'Challenges: Low to High' },
   ];
-  
-  const pointsOptions = [
-    { value: "desc", label: "Points: High to Low" },
-    { value: "asc", label: "Points: Low to High" },
-  ];
+
   
   const rankOptions = [
     { value: "all", label: "All Ranks" },
@@ -35,7 +32,11 @@ export default function LeaderboardPage() {
     { value: "diamond_debugger", label: "Diamond Debugger" },
     { value: "elite_codebreaker", label: "Elite Codebreaker" },
   ];
-  
+
+  const pointsOrder = sortOption.startsWith("points") ? sortOption.split("_")[1] : undefined;
+  const challengesOrder = sortOption.startsWith("challenges") ? sortOption.split("_")[1] : undefined;
+
+
   useEffect(() => {
     const fetchTopUsers = async () => {
       try {
@@ -55,31 +56,42 @@ export default function LeaderboardPage() {
   
   useEffect(() => {
     const fetchLeaderboardData = async () => {
-      setIsLoading(true);
-      try {
-        const queryParams = new URLSearchParams({
+    setIsLoading(true);
+    try {
+        console.log({
           pointsOrder,
           challengesOrder,
           rankFilter,
           searchQuery,
-          page: currentPage
+          currentPage
         });
-        
-        const response = await fetch(`/api/leaderboard/filtered?${queryParams}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          setLeaderboardData(data.leaderboardData);
-        }
-      } catch (error) {
-        console.error("Error fetching leaderboard data:", error);
-      } finally {
-        setIsLoading(false);
+      const queryParams = new URLSearchParams({
+        ...(pointsOrder && { pointsOrder }),
+        ...(challengesOrder && { challengesOrder }),
+        rankFilter,
+        searchQuery,
+        page: currentPage
+      });
+
+      const response = await fetch(`/api/leaderboard/filtered?${queryParams}`);
+      const data = await response.json();
+      
+      console.log(data); // Asegúrate de que la respuesta contiene los datos correctos
+
+      if (data.success) {
+        setLeaderboardData(data.leaderboardData);
       }
-    };
-    
-    fetchLeaderboardData();
-  }, [challengesOrder, pointsOrder, rankFilter, searchQuery, currentPage]);
+    } catch (error) {
+      console.error("Error fetching leaderboard data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchLeaderboardData();
+}, [sortOption, rankFilter, searchQuery, currentPage]);
+
+
   
   const getPodiumUser = (position) => {
     return topUsers.find(user => user.position === position);
@@ -144,34 +156,19 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="w-full">
-            <div className="block text-sm font-medium text-gray-400 mb-2">Points</div>
+            <div className="block text-sm font-medium text-gray-400 mb-2">Sort by</div>
             <Dropdown
-              options={pointsOptions.map(opt => opt.label)}
-              value={pointsOptions.find(opt => opt.value === pointsOrder)?.label}
-              onChange={(value) => {
-                const option = pointsOptions.find(opt => opt.label === value);
-                setPointsOrder(option?.value || "desc");
+              options={sortOptions.map(opt => opt.label)}
+              value={sortOptions.find(opt => opt.value === sortOption)?.label}
+              onChange={(label) => {
+                const option = sortOptions.find(opt => opt.label === label);
+                setSortOption(option?.value || "points_desc");
               }}
               label=""
               className="w-full"
-              aria-label="Sort by points"
-            />
-          </div>
-          
-          <div className="w-full">
-            <div className="block text-sm font-medium text-gray-400 mb-2">Challenges</div>
-            <Dropdown
-              options={challengesOptions.map(opt => opt.label)}
-              value={challengesOptions.find(opt => opt.value === challengesOrder)?.label}
-              onChange={(value) => {
-                const option = challengesOptions.find(opt => opt.label === value);
-                setChallengesOrder(option?.value || "desc");
-              }}
-              label=""
-              className="w-full"
-              aria-label="Sort by challenges"
+              aria-label="Sort by"
             />
           </div>
           
