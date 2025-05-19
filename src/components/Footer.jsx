@@ -16,15 +16,15 @@ export default function Footer() {
 
           {/* Social Links a la derecha */}
           <div className="flex space-x-6 items-center">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" 
+            <a href="https://github.com" aria-label="GitHub" target="_blank" rel="noopener noreferrer" 
                className="text-gray-400 hover:text-white transition-colors">
               <FaGithub size={24} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" 
+            <a href="https://linkedin.com" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer" 
                className="text-gray-400 hover:text-white transition-colors">
               <FaLinkedin size={24} />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" 
+            <a href="https://twitter.com" aria-label="Twitter" target="_blank" rel="noopener noreferrer" 
                className="text-gray-400 hover:text-white transition-colors">
               <FaTwitter size={24} />
             </a>

@@ -14,7 +14,6 @@ import {
 } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { generateAvatar } from "@/utils/avatar";
-import PropTypes from 'prop-types';
 
 function getBadgeStyles(rank) {
   if (!rank) return {
@@ -79,7 +78,7 @@ export default function Leaderboard({
 
   if (isLoading) {
     return (
-      <div className="w-full flex justify-center items-center py-12">
+      <div className="w-full flex justify-center items-center py-12" role = "progressbar">
         <Spinner size="lg" color="danger" />
       </div>
     );
