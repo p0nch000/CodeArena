@@ -42,7 +42,6 @@ export default function ChallengeGenerated({ challenge }) {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-mono text-mahindra-white">{title}</h2>
       </div>
-
       <div className="mb-6">
         <h3 className="font-mono mb-2 text-mahindra-white">Description:</h3>
         <div className="bg-gray-900 p-4 rounded-md font-mono text-mahindra-light-gray whitespace-pre-wrap">
