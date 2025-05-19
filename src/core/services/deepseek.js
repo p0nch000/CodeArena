@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 require('dotenv').config();
 
-class DeepSeek {
+class Deepseek {
   constructor() {
     this.openai = new OpenAI({
       baseURL: 'https://api.deepseek.com',
@@ -46,8 +46,41 @@ Based on the difficulty provided by the user, generate a coding challenge with t
     "Memory constraints (e.g., Maximum memory usage: 256MB)",
     "Input format specifications",
     "Any other relevant constraints"
+  ],
+  "test_cases": [
+    {
+      "input": "Test case input 1",
+      "output": "Expected output 1"
+    },
+    {
+      "input": "Test case input 2",
+      "output": "Expected output 2"
+    },
+    {
+      "input": "Test case input 3",
+      "output": "Expected output 3"
+    },
+    {
+      "input": "Test case input 4",
+      "output": "Expected output 4"
+    },
+    {
+      "input": "Test case input 5",
+      "output": "Expected output 5"
+    },
+    {
+      "input": "Test case input 6 (edge case)",
+      "output": "Expected output 6"
+    }
   ]
 }
+
+IMPORTANT: The "examples" array is for displaying to users in the challenge description, while the "test_cases" array contains the actual test data that will be used to validate user submissions. Make sure to:
+1. Create 5-6 different test cases that thoroughly test the solution
+2. Include some edge cases in the test cases
+3. Make test cases distinct from the examples
+4. Include a variety of input complexity and scenarios
+5. Make sure test cases cover all edge cases mentioned in the description
 
 Tailor the challenge difficulty appropriately: 
 - Easy: Solvable with basic data structures and simple algorithms
@@ -86,7 +119,8 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       title: "Code Challenge",
       description: "",
       examples: "",
-      constraints: []
+      constraints: [],
+      test_cases: []
     };
   
     const titleLine = lines.find(line => line.match(/^#\s+/) || line.match(/^Title:\s+/i));
@@ -112,7 +146,12 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       if (line.match(/^##?\s+Constraints?/i) || line.match(/^Constraints?:/i)) {
         currentSection = "constraints";
         continue;
-      } 
+      }
+      
+      if (line.match(/^##?\s+Test Cases?/i) || line.match(/^Test Cases?:/i)) {
+        currentSection = "test_cases";
+        continue;
+      }
       
       if (line.match(/^##?\s+/)) {
         currentSection = null;
@@ -130,10 +169,43 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
             challenge.constraints.push(cleanedLine);
           }
         }
+      } else if (currentSection === "test_cases") {
+        challenge.test_cases += `${line}\n`;
       }
     }
+    
     challenge.description = challenge.description.trim();
     challenge.examples = challenge.examples.trim();
+    
+    // Try to parse test cases from text
+    if (typeof challenge.test_cases === 'string' && challenge.test_cases.trim()) {
+      try {
+        // Extract test cases from text
+        const testCasePairs = [];
+        let currentInput = null;
+        
+        const testCaseLines = challenge.test_cases.trim().split('\n');
+        for (const line of testCaseLines) {
+          if (line.toLowerCase().includes('input:')) {
+            currentInput = line.split('input:')[1].trim();
+          } else if (line.toLowerCase().includes('output:') && currentInput) {
+            const output = line.split('output:')[1].trim();
+            testCasePairs.push({ input: currentInput, output });
+            currentInput = null;
+          }
+        }
+        
+        if (testCasePairs.length > 0) {
+          challenge.test_cases = testCasePairs;
+        } else {
+          challenge.test_cases = [];
+        }
+      } catch (e) {
+        console.warn("Failed to parse test cases from text", e);
+        challenge.test_cases = [];
+      }
+    }
+    
     if (challenge.constraints.length === 0 && challenge.description) {
       const constraintLines = challenge.description
         .split('\n')
@@ -156,7 +228,8 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       examples: challenge.examples || "No provided examples",
       constraints: Array.isArray(challenge.constraints) ? 
         challenge.constraints : 
-        [challenge.constraints?.toString() || "No provided constraints"]
+        [challenge.constraints?.toString() || "No provided constraints"],
+      test_cases: challenge.test_cases || []
     };
     
     if (!Array.isArray(validatedChallenge.constraints) || validatedChallenge.constraints.length === 0) {
@@ -169,7 +242,59 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       } else if (validatedChallenge.examples.examples) {
         validatedChallenge.examples = validatedChallenge.examples.examples;
       }
-      
+    }
+    
+    // Ensure test_cases is an array of input/output objects
+    if (!Array.isArray(validatedChallenge.test_cases)) {
+      // If test_cases is a string, try to convert it to an array of objects
+      if (typeof validatedChallenge.test_cases === 'string' && validatedChallenge.test_cases.trim()) {
+        try {
+          // Simple parsing: look for Input: and Output: patterns
+          const lines = validatedChallenge.test_cases.split('\n');
+          const testCases = [];
+          let currentCase = {};
+          
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (trimmedLine.toLowerCase().startsWith('input:')) {
+              if (currentCase.input) {
+                testCases.push({...currentCase});
+                currentCase = {};
+              }
+              currentCase.input = trimmedLine.substring(6).trim();
+            } else if (trimmedLine.toLowerCase().startsWith('output:')) {
+              currentCase.output = trimmedLine.substring(7).trim();
+              if (currentCase.input && currentCase.output) {
+                testCases.push({...currentCase});
+                currentCase = {};
+              }
+            }
+          }
+          
+          if (testCases.length > 0) {
+            validatedChallenge.test_cases = testCases;
+          } else {
+            // Generate basic test cases from examples
+            validatedChallenge.test_cases = this.generateTestCasesFromExamples(validatedChallenge.examples);
+          }
+        } catch (e) {
+          console.warn("Failed to parse test cases string", e);
+          validatedChallenge.test_cases = this.generateTestCasesFromExamples(validatedChallenge.examples);
+        }
+      } else {
+        // Generate default test cases if none provided
+        validatedChallenge.test_cases = this.generateTestCasesFromExamples(validatedChallenge.examples);
+      }
+    }
+    
+    // Ensure each test case has input and output properties
+    validatedChallenge.test_cases = validatedChallenge.test_cases.filter(tc => 
+      tc && typeof tc === 'object' && tc.input !== undefined && tc.output !== undefined
+    );
+    
+    // Generate default test cases if none valid
+    if (validatedChallenge.test_cases.length === 0) {
+      validatedChallenge.test_cases = this.generateTestCasesFromExamples(validatedChallenge.examples);
     }
     
     if (Array.isArray(validatedChallenge.constraints)) {
@@ -190,7 +315,65 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
     
     return validatedChallenge;
   }
+  
+  /**
+   * Generate test cases from examples if no test cases are provided
+   */
+  generateTestCasesFromExamples(examples) {
+    const testCases = [];
+    
+    try {
+      // Handle array of examples
+      if (Array.isArray(examples)) {
+        examples.forEach(example => {
+          if (example && typeof example === 'object' && example.input !== undefined && example.output !== undefined) {
+            testCases.push({
+              input: example.input,
+              output: example.output
+            });
+          }
+        });
+      } 
+      // Handle single example object
+      else if (examples && typeof examples === 'object' && examples.input !== undefined && examples.output !== undefined) {
+        testCases.push({
+          input: examples.input,
+          output: examples.output
+        });
+      }
+      
+      // If we have at least one test case from examples, create a couple of variations
+      if (testCases.length > 0) {
+        // Add a simple baseline test case
+        testCases.push({
+          input: "Simple test input",
+          output: "Expected output for simple test"
+        });
+        
+        // Add an edge case test
+        testCases.push({
+          input: "Edge case input (e.g., empty array, maximum value, etc.)",
+          output: "Expected output for edge case"
+        });
+      } else {
+        // If no usable examples, create some default test cases
+        testCases.push(
+          { input: "Test input 1", output: "Expected output 1" },
+          { input: "Test input 2", output: "Expected output 2" },
+          { input: "Test input 3", output: "Expected output 3" }
+        );
+      }
+    } catch (e) {
+      console.warn("Error generating test cases from examples", e);
+      // Fallback to default test cases
+      testCases.push(
+        { input: "Default test input 1", output: "Default expected output 1" },
+        { input: "Default test input 2", output: "Default expected output 2" }
+      );
+    }
+    
+    return testCases;
+  }
 }
 
-const deepseekService = new DeepSeek();
-export default deepseekService;
+export default new Deepseek();
