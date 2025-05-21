@@ -8,7 +8,7 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/src/$1', // 👈 Aquí ajustamos el alias @
     '^.+\\.(css|scss)$': 'identity-obj-proxy',
   },
-  testEnvironment: 'jest-environment-jsdom',
+  testEnvironment: 'node',
 };
 
 module.exports = createJestConfig(customJestConfig);
