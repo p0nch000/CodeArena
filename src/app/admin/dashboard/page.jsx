@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Dropdown from "@/components/Dropdown";
 import MetricCard from "./components/MetricCard";
 import LanguageDistributionChart from "./components/LanguageDistributionChart";
@@ -9,15 +9,13 @@ import { CodeBracketIcon, UsersIcon, DocumentTextIcon, ChartBarIcon } from '@her
 import Link from "next/link";
 import ChallengeMetricsTable from "./components/ChallengeMetricsTable";
 import Challenge from "@/app/(homepage)/challenge/page";
+import { Pagination } from "@nextui-org/react";
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'; // Añade esta importación si no está
 
 // Función formateadora para los valores del gráfico
 const valueFormatter = (item) => `${item.value}%`;
 
 export default function AdminDashboard() {
-  // Filter states
-  const [timeFilter, setTimeFilter] = useState("Last week");
-  const [difficultyFilter, setDifficultyFilter] = useState("All difficulties");
-  const [languageFilter, setLanguageFilter] = useState("All languages");
   
   // Data states - individual state for each metric
   const [challengesData, setChallengesData] = useState(null);
@@ -52,14 +50,25 @@ export default function AdminDashboard() {
   const [challengesTableData, setChallengesTableData] = useState([]);
   const [loadingChallengesTable, setLoadingChallengesTable] = useState(true);
   const [challengesTableError, setChallengesTableError] = useState(null);
+
+  const [challengeSearchQuery, setChallengeSearchQuery] = useState("");
+  const [challengeCurrentPage, setChallengeCurrentPage] = useState(1);
+  const CHALLENGE_PAGE_SIZE = 5;
+
+  // Añade estos estados para los filtros
+const [difficultyFilter, setDifficultyFilter] = useState("All difficulties");
+const [sortCriteria, setSortCriteria] = useState("submissions");
   
   // Last updated timestamps
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  
+
   // Dropdown options
-  const timeOptions = ["Last week", "Last month", "Last quarter", "Last year"];
   const difficultyOptions = ["All difficulties", "Easy", "Medium", "Hard"];
-  const languageOptions = ["All languages", "JavaScript", "Python", "Java", "C++", "Go"];
+  const sortOptions = [
+    { value: 'submissions', label: 'Sort by Submissions' },
+    { value: 'successRate', label: 'Sort by Success Rate' },
+    { value: 'points', label: 'Sort by Average Points' }
+  ];
   
   // Individual fetch functions for each metric
   async function fetchChallengesData() {
@@ -234,27 +243,6 @@ export default function AdminDashboard() {
   // Check if any metric is still loading
   const isAnyLoading = loadingChallenges || loadingUsers || loadingSubmissions || loadingLanguageDist || loadingSubmissionsChart || loadingSuccessRate || loadingChallengesTable;
   
-  // Datos para la distribución de lenguajes
-  const languageDistributionData = [
-    { label: 'JavaScript', value: 35 },
-    { label: 'Python', value: 25 },
-    { label: 'Java', value: 15 },
-    { label: 'C++', value: 12 },
-    { label: 'Go', value: 8 },
-    { label: 'Others', value: 5 }
-  ];
-
-  const submissionsChartDataMock = {
-    months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
-    series: [
-      {
-        data: [1400, 1850, 1650, 2250, 2800, 2350, 3100, 3500, 3200],
-        label: 'Submissions',
-        color: '#b8383a',
-      }
-    ]
-  };
-
   // Get formatted timestamp for last updated
   const getLastUpdatedText = () => {
     if (!lastUpdated) return "Never updated";
@@ -266,6 +254,59 @@ export default function AdminDashboard() {
     if (diffMins < 1) return "Updated just now";
     if (diffMins === 1) return "Updated 1 minute ago";
     return `Updated ${diffMins} minutes ago`;
+  };
+
+  // Filtra y pagina los datos de la tabla de desafíos
+  const filteredAndPaginatedChallengeData = useMemo(() => {
+    if (!challengesTableData || !Array.isArray(challengesTableData)) {
+      return { challenges: [], totalPages: 0, totalItems: 0 };
+    }
+    
+    // Primero aplicar filtro de texto de búsqueda
+    let filtered = challengeSearchQuery
+      ? challengesTableData.filter(challenge => 
+          challenge.name.toLowerCase().includes(challengeSearchQuery.toLowerCase())
+        )
+      : [...challengesTableData];
+    
+    // Filtro por dificultad
+    if (difficultyFilter !== "All difficulties") {
+      filtered = filtered.filter(challenge => challenge.difficulty === difficultyFilter);
+    }
+    
+    // Aplicar ordenamiento según el criterio seleccionado (siempre de mayor a menor)
+    if (sortCriteria === 'submissions') {
+      filtered.sort((a, b) => b.submissions - a.submissions);
+    } else if (sortCriteria === 'successRate') {
+      filtered.sort((a, b) => b.successRate - a.successRate);
+    } else if (sortCriteria === 'points') {
+      filtered.sort((a, b) => b.points - a.points);
+    }
+    
+    // Calcular número total de páginas
+    const totalPages = Math.ceil(filtered.length / CHALLENGE_PAGE_SIZE);
+    
+    // Paginar los resultados
+    const startIndex = (challengeCurrentPage - 1) * CHALLENGE_PAGE_SIZE;
+    const endIndex = startIndex + CHALLENGE_PAGE_SIZE;
+    const paginatedData = filtered.slice(startIndex, endIndex);
+    
+    return {
+      challenges: paginatedData,
+      totalPages: totalPages,
+      totalItems: filtered.length
+    };
+  }, [challengesTableData, challengeSearchQuery, challengeCurrentPage, CHALLENGE_PAGE_SIZE, difficultyFilter, sortCriteria]);
+
+// Añade esta función para manejar el cambio de página
+const handleChallengePageChange = (page) => {
+    setChallengeCurrentPage(page);
+  };
+
+  // Añade esta función para manejar la búsqueda
+  const handleChallengeSearch = (e) => {
+    setChallengeSearchQuery(e.target.value);
+    setChallengeCurrentPage(1); // Resetear a la primera página al buscar
   };
 
   return (
@@ -431,17 +472,106 @@ export default function AdminDashboard() {
 
         {/* Challenge metrics table */}
         <div className="bg-gray-900/70 rounded-xl p-5 border border-gray-800 overflow-hidden mb-6">
-          <h2 className="text-xl font-bold text-white mb-4">Challenge Metrics</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <h2 className="text-xl font-bold text-white">Challenge Metrics</h2>
+          </div>
+          
+          {/* Filtros estilo leaderboard */}
+          <div className="mb-6 bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+            <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
+              <div className="relative flex-grow">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                  <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+                </div>
+                <input
+                  type="search"
+                  placeholder="Search challenges by name..."
+                  className="block w-full pl-12 pr-4 py-3 text-base bg-gray-900/50 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-white"
+                  value={challengeSearchQuery}
+                  onChange={handleChallengeSearch}
+                  aria-label="Search challenges"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="w-full">
+                <div className="block text-sm font-medium text-gray-400 mb-2">Difficulty</div>
+                <Dropdown
+                  options={difficultyOptions}
+                  value={difficultyFilter}
+                  onChange={(value) => {
+                    setDifficultyFilter(value);
+                    setChallengeCurrentPage(1); // Reset to first page
+                  }}
+                  label=""
+                  className="w-full"
+                  aria-label="Filter by difficulty"
+                />
+              </div>
+              
+              <div className="w-full">
+                <div className="block text-sm font-medium text-gray-400 mb-2">Sort By</div>
+                <Dropdown
+                  options={sortOptions.map(opt => opt.label)}
+                  value={sortOptions.find(opt => opt.value === sortCriteria)?.label}
+                  onChange={(label) => {
+                    const option = sortOptions.find(opt => opt.label === label);
+                    setSortCriteria(option?.value || "submissions");
+                    setChallengeCurrentPage(1); // Reset to first page
+                  }}
+                  label=""
+                  className="w-full"
+                  aria-label="Sort challenges by"
+                />
+              </div>
+            </div>
+          </div>
           
           {loadingChallengesTable ? (
             <div className="h-40 flex items-center justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
             </div>
-          ) : challengesTableData && challengesTableData.length > 0 ? (
-            <ChallengeMetricsTable metrics={challengesTableData} />
+          ) : filteredAndPaginatedChallengeData.challenges && filteredAndPaginatedChallengeData.challenges.length > 0 ? (
+            <>
+              <ChallengeMetricsTable 
+                metrics={filteredAndPaginatedChallengeData.challenges} 
+                currentPage={challengeCurrentPage}
+                pageSize={CHALLENGE_PAGE_SIZE}
+              />
+              
+              {/* Paginación */}
+              {filteredAndPaginatedChallengeData.totalPages > 1 && (
+                <div className="flex justify-center mt-4">
+                  <Pagination
+                    total={filteredAndPaginatedChallengeData.totalPages}
+                    initialPage={1}
+                    page={challengeCurrentPage}
+                    onChange={handleChallengePageChange}
+                    size="sm"
+                    classNames={{
+                      wrapper: "gap-1 overflow-visible rounded",
+                      item: "w-8 h-8 text-sm rounded-md bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
+                      cursor: "bg-mahindra-red text-white font-bold shadow-md",
+                      next: "bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
+                      prev: "bg-gray-800/50 text-gray-300 hover:bg-red-500/20",
+                    }}
+                  />
+                </div>
+              )}
+              
+              {/* Resultados de búsqueda si hay búsqueda activa */}
+              {(challengeSearchQuery || difficultyFilter !== "All difficulties") && (
+                <div className="text-sm text-gray-400 mt-2">
+                  Showing {filteredAndPaginatedChallengeData.challenges.length} of {filteredAndPaginatedChallengeData.totalItems} results
+                </div>
+              )}
+            </>
           ) : (
             <div className="h-40 flex items-center justify-center text-gray-400">
-              No challenge metrics available
+              {challengeSearchQuery || difficultyFilter !== "All difficulties" 
+                ? "No challenges found matching your criteria" 
+                : "No challenge metrics available"}
             </div>
           )}
         </div>
