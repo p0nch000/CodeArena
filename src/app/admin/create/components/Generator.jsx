@@ -5,6 +5,7 @@ export default function Generator({ onGenerate, onDifficultySelect, isGenerating
   const [difficulty, setDifficulty] = useState(''); 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  
 
   // Update loading state if controlled externally
   useEffect(() => {
@@ -22,52 +23,6 @@ export default function Generator({ onGenerate, onDifficultySelect, isGenerating
 
   const handleDifficultySelect = (selectedDifficulty) => {
     setDifficulty(selectedDifficulty);
-  };
-
-  const handleGenerate = async () => {
-    if (!difficulty) {
-      setErrorMessage("Please select a difficulty.");
-      return;
-    }
-  
-    setIsLoading(true);
-    setErrorMessage('');
-  
-    try {
-      const response = await fetch("/api/admin/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          prompt: `Generate a ${difficulty} coding challenge. Return as valid JSON with the following structure:
-          {
-            "title": "Challenge Title",
-            "description": "Detailed description of the challenge",
-            "examples": [{"input": "Example input", "output": "Example output", "explanation": "Explanation"}],
-            "constraints": ["constraint 1", "constraint 2"]
-          }
-          
-          For harder challenges, you can structure examples as an object with input and output fields.
-          
-          `
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Error generating the challenge: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      if (!data.challenge) {
-        throw new Error("Could not generate a valid challenge.");
-      }
-  
-      onGenerate(data.challenge);
-    } catch (error) {
-      console.error(error);
-      setErrorMessage(error.message || "There was an error generating the challenge. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
@@ -107,7 +62,7 @@ export default function Generator({ onGenerate, onDifficultySelect, isGenerating
 
           {/* Generate Button */}
           <button
-            onClick={handleGenerate}
+            onClick={() => onGenerate(difficulty)}
             className={`flex items-center justify-center ${
               isLoading ? 'bg-gray-700 cursor-not-allowed' : 'bg-mahindra-red hover:bg-red-700'
             } text-mahindra-white py-3 px-6 rounded-md transition-colors`}

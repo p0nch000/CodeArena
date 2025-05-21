@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import challengeCache from "./challengeCache";
 require('dotenv').config();
 
 class Deepseek {
@@ -7,9 +8,85 @@ class Deepseek {
       baseURL: 'https://api.deepseek.com',
       apiKey: process.env.DEEPSEEK_API_KEY,
     });
+    
+    // Initialize cache in the background after a short delay
+    setTimeout(() => {
+      this.initializeCache();
+    }, 1000);
+  }
+  
+  // Initialize cache with pre-generated challenges
+  async initializeCache() {
+    console.log("Starting to pre-populate challenge cache...");
+    await challengeCache.prePopulate(this.generateCodeChallengeDirectly.bind(this));
+    console.log("Challenge cache pre-population complete");
   }
 
   async generateCodeChallenge(prompt) {
+    // Extract difficulty from prompt
+    const difficultyMatch = prompt.match(/Generate a (easy|medium|hard) coding challenge/i);
+    const difficulty = difficultyMatch ? difficultyMatch[1].toLowerCase() : null;
+    
+    if (difficulty) {
+      // Try to get challenge from cache first
+      const cachedChallenge = challengeCache.getChallenge(difficulty);
+      if (cachedChallenge) {
+        console.log(`Using cached ${difficulty} challenge. Starting async cache refill.`);
+        
+        // Get current cache size
+        const currentCacheSize = challengeCache.cache[difficulty].length;
+        
+        // If we're getting low on cached challenges, trigger refill in background
+        if (currentCacheSize < challengeCache.maxCacheSize / 2) {
+          console.log(`Cache running low (${currentCacheSize} challenges). Starting background refill.`);
+          
+          // Start background generation to refill multiple slots at once
+          // Don't wait for this to finish - it runs in background
+          const refillCount = challengeCache.maxCacheSize - currentCacheSize;
+          this.refillCache(difficulty, refillCount);
+        } else {
+          // Just refill the one we took
+          this.generateCodeChallengeDirectly(`Generate a ${difficulty} coding challenge.`)
+            .then(challenge => {
+              challengeCache.addChallenge(difficulty, challenge);
+              console.log(`Added 1 new ${difficulty} challenge to cache`);
+            })
+            .catch(error => {
+              console.error("Background challenge generation failed:", error);
+            });
+        }
+        
+        return cachedChallenge;
+      }
+    }
+    
+    // No cached challenge available, generate a new one
+    return this.generateCodeChallengeDirectly(prompt);
+  }
+  
+  // Helper method to refill multiple cache slots in the background
+  async refillCache(difficulty, count) {
+    try {
+      // Generate challenges in parallel batches to avoid overwhelming the API
+      const batchSize = 3;
+      for (let i = 0; i < count; i += batchSize) {
+        const batchCount = Math.min(batchSize, count - i);
+        const batchPromises = Array(batchCount).fill()
+          .map(() => this.generateCodeChallengeDirectly(`Generate a ${difficulty} coding challenge.`));
+        
+        const results = await Promise.all(batchPromises);
+        results.forEach(challenge => {
+          if (challenge) challengeCache.addChallenge(difficulty, challenge);
+        });
+        
+        console.log(`Added ${results.filter(Boolean).length} ${difficulty} challenges to cache`);
+      }
+    } catch (error) {
+      console.error(`Error refilling ${difficulty} cache:`, error);
+    }
+  }
+
+  async generateCodeChallengeDirectly(prompt) {
     try {
       const completion = await this.openai.chat.completions.create({
         messages: [
@@ -114,6 +191,7 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
   }
   
   parseChallengeFromText(content) {
+    // [Existing implementation remains the same]
     const lines = content.split("\n");
     const challenge = {
       title: "Code Challenge",
@@ -222,6 +300,7 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
   }
   
   ensureValidChallengeFormat(challenge) {
+    // [Existing implementation remains the same]
     const validatedChallenge = {
       title: challenge.title || "Code Challenge",
       description: challenge.description || "No provided description",
@@ -316,10 +395,8 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
     return validatedChallenge;
   }
   
-  /**
-   * Generate test cases from examples if no test cases are provided
-   */
   generateTestCasesFromExamples(examples) {
+    // [Existing implementation remains the same]
     const testCases = [];
     
     try {
