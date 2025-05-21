@@ -1,23 +1,35 @@
-
-
 // Judge0 
 export const LANGUAGES = {
-  JAVASCRIPT: { id: 63, name: "JavaScript (Node.js 12.14.0)" },
-  JAVASCRIPT_LATEST: { id: 102, name: "JavaScript (Node.js 22.08.0)" },
-  PYTHON: { id: 71, name: "Python (3.8.1)" },
-  PYTHON_LATEST: { id: 100, name: "Python (3.12.5)" },
-  JAVA: { id: 91, name: "Java (JDK 17.0.6)" },
-  CPP: { id: 54, name: "C++ (GCC 9.2.0)" },
-  CPP_LATEST: { id: 105, name: "C++ (GCC 14.1.0)" },
-  C: { id: 50, name: "C (GCC 9.2.0)" },
-  C_LATEST: { id: 103, name: "C (GCC 14.1.0)" },
-  CSHARP: { id: 51, name: "C# (Mono 6.6.0.161)" },
-  GO: { id: 60, name: "Go (1.13.5)" },
-  GO_LATEST: { id: 107, name: "Go (1.23.5)" },
-  RUST: { id: 73, name: "Rust (1.40.0)" },
-  RUST_LATEST: { id: 108, name: "Rust (1.85.0)" },
-  TYPESCRIPT: { id: 74, name: "TypeScript (3.7.4)" },
-  TYPESCRIPT_LATEST: { id: 101, name: "TypeScript (5.6.2)" },
+  JAVASCRIPT_NODE: {
+    id: 63, // Judge0 ID for Node.js 12.14.0
+    name: "JavaScript (Node.js 12.14.0)",
+    extension: "js"
+  },
+  JAVASCRIPT_NODE_LATEST: {
+    id: 93, // Judge0 ID for Node.js 22.08.0 (or latest available)
+    name: "JavaScript (Node.js 22.08.0)",
+    extension: "js"
+  },
+  PYTHON: {
+    id: 71, // Judge0 ID for Python 3.8.1
+    name: "Python (3.8.1)",
+    extension: "py"
+  },
+  PYTHON_LATEST: {
+    id: 92, // Judge0 ID for Python 3.12.5 (or latest available)
+    name: "Python (3.12.5)",
+    extension: "py"
+  },
+  CPP: {
+    id: 54, // Judge0 ID for C++ (GCC 9.2.0)
+    name: "C++ (GCC 9.2.0)",
+    extension: "cpp"
+  },
+  CPP_LATEST: {
+    id: 95, // Judge0 ID for C++ (GCC 14.1.0)
+    name: "C++ (GCC 14.1.0)",
+    extension: "cpp"
+  }
 };
 
 export const STATUS = {

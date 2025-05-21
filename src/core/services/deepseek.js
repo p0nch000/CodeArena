@@ -124,40 +124,55 @@ Based on the difficulty provided by the user, generate a coding challenge with t
     "Input format specifications",
     "Any other relevant constraints"
   ],
+  "runtime": 500,
+  "memory": 128,
+  "deadline": "2023-06-07T00:00:00.000Z",
   "test_cases": [
     {
-      "input": "Test case input 1",
+      "input": {"array": [1,5,8,10,14,19], "k": 3},
       "output": "Expected output 1"
     },
     {
-      "input": "Test case input 2",
+      "input": {"string": "hello world", "char": "l"},
       "output": "Expected output 2"
     },
     {
-      "input": "Test case input 3",
+      "input": {"matrix": [[1,2,3],[4,5,6],[7,8,9]]},
       "output": "Expected output 3"
     },
     {
-      "input": "Test case input 4",
+      "input": {"n": 5, "edges": [[0,1],[1,2],[2,3],[3,4]]},
       "output": "Expected output 4"
     },
     {
-      "input": "Test case input 5",
+      "input": {"tree": [3,9,20,null,null,15,7]},
       "output": "Expected output 5"
     },
     {
-      "input": "Test case input 6 (edge case)",
+      "input": {"value": 42},
       "output": "Expected output 6"
     }
   ]
 }
 
-IMPORTANT: The "examples" array is for displaying to users in the challenge description, while the "test_cases" array contains the actual test data that will be used to validate user submissions. Make sure to:
-1. Create 5-6 different test cases that thoroughly test the solution
-2. Include some edge cases in the test cases
-3. Make test cases distinct from the examples
-4. Include a variety of input complexity and scenarios
-5. Make sure test cases cover all edge cases mentioned in the description
+IMPORTANT REQUIREMENTS FOR TEST CASES:
+1. ALL test case inputs MUST be valid JSON objects with appropriate keys and values
+2. The "input" field in each test case MUST be a JSON object, NOT a string
+3. For array problems, use format like: {"nums": [1,5,8,10,14,19], "target": 24}
+4. For string problems, use format like: {"s": "example string", "k": 3}
+5. For tree problems, use format like: {"root": [3,9,20,null,null,15,7]}
+6. For graph problems, use format like: {"edges": [[0,1],[1,2],[2,0]], "n": 3}
+7. NEVER use string representations for inputs - always use proper JSON objects
+8. Create 5-6 different test cases that thoroughly test the solution
+9. Include some edge cases in the test cases
+10. Make test cases distinct from the examples
+11. Include a variety of input complexity and scenarios
+12. Make sure test cases cover all edge cases mentioned in the description
+13. Include "runtime" field with a reasonable millisecond value (e.g., 300 for easy, 500 for medium, 1000 for hard)
+14. Include "memory" field with a reasonable MB value (e.g., 64 for easy, 128 for medium, 256 for hard)
+15. Include "deadline" field set to one week from today in ISO format
+
+The "examples" array is for displaying to users in the challenge description, while the "test_cases" array contains the actual test data that will be used to validate user submissions.
 
 Tailor the challenge difficulty appropriately: 
 - Easy: Solvable with basic data structures and simple algorithms
@@ -300,7 +315,10 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
   }
   
   ensureValidChallengeFormat(challenge) {
-    // [Existing implementation remains the same]
+    // Create a date one week from now
+    const oneWeekFromNow = new Date();
+    oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+    
     const validatedChallenge = {
       title: challenge.title || "Code Challenge",
       description: challenge.description || "No provided description",
@@ -308,7 +326,10 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       constraints: Array.isArray(challenge.constraints) ? 
         challenge.constraints : 
         [challenge.constraints?.toString() || "No provided constraints"],
-      test_cases: challenge.test_cases || []
+      test_cases: challenge.test_cases || [],
+      runtime: challenge.runtime || this.getDefaultRuntime(challenge.difficulty),
+      memory: challenge.memory || this.getDefaultMemory(challenge.difficulty),
+      deadline: challenge.deadline || oneWeekFromNow.toISOString()
     };
     
     if (!Array.isArray(validatedChallenge.constraints) || validatedChallenge.constraints.length === 0) {
@@ -323,7 +344,7 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       }
     }
     
-    // Ensure test_cases is an array of input/output objects
+    // Ensure test_cases is an array of input/output objects with proper JSON structure
     if (!Array.isArray(validatedChallenge.test_cases)) {
       // If test_cases is a string, try to convert it to an array of objects
       if (typeof validatedChallenge.test_cases === 'string' && validatedChallenge.test_cases.trim()) {
@@ -340,7 +361,14 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
                 testCases.push({...currentCase});
                 currentCase = {};
               }
-              currentCase.input = trimmedLine.substring(6).trim();
+              // Try to parse as JSON if possible
+              const inputValue = trimmedLine.substring(6).trim();
+              try {
+                currentCase.input = JSON.parse(inputValue);
+              } catch (e) {
+                // If not valid JSON, use as string but wrap in a JSON object
+                currentCase.input = { "value": inputValue };
+              }
             } else if (trimmedLine.toLowerCase().startsWith('output:')) {
               currentCase.output = trimmedLine.substring(7).trim();
               if (currentCase.input && currentCase.output) {
@@ -366,10 +394,26 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       }
     }
     
-    // Ensure each test case has input and output properties
-    validatedChallenge.test_cases = validatedChallenge.test_cases.filter(tc => 
-      tc && typeof tc === 'object' && tc.input !== undefined && tc.output !== undefined
-    );
+    // Ensure each test case has input and output properties with proper JSON structure
+    validatedChallenge.test_cases = validatedChallenge.test_cases.map(tc => {
+      if (tc && typeof tc === 'object' && tc.input !== undefined && tc.output !== undefined) {
+        // If input is a string, try to parse it as JSON
+        if (typeof tc.input === 'string') {
+          try {
+            tc.input = JSON.parse(tc.input);
+          } catch (e) {
+            // If parsing fails, wrap it in a JSON object
+            tc.input = { "value": tc.input };
+          }
+        }
+        // If input is not an object, wrap it
+        else if (typeof tc.input !== 'object' || tc.input === null) {
+          tc.input = { "value": tc.input };
+        }
+        return tc;
+      }
+      return null;
+    }).filter(Boolean);
     
     // Generate default test cases if none valid
     if (validatedChallenge.test_cases.length === 0) {
@@ -396,7 +440,6 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
   }
   
   generateTestCasesFromExamples(examples) {
-    // [Existing implementation remains the same]
     const testCases = [];
     
     try {
@@ -404,8 +447,23 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       if (Array.isArray(examples)) {
         examples.forEach(example => {
           if (example && typeof example === 'object' && example.input !== undefined && example.output !== undefined) {
+            // Try to parse input as JSON if it's a string
+            let input = example.input;
+            if (typeof input === 'string') {
+              try {
+                input = JSON.parse(input);
+              } catch (e) {
+                // If parsing fails, create a structured object
+                input = { "value": input };
+              }
+            } 
+            // If input is not an object, wrap it
+            else if (typeof input !== 'object' || input === null) {
+              input = { "value": input };
+            }
+            
             testCases.push({
-              input: example.input,
+              input: input,
               output: example.output
             });
           }
@@ -413,43 +471,124 @@ Return ONLY valid JSON without additional text, code blocks, or formatting.`
       } 
       // Handle single example object
       else if (examples && typeof examples === 'object' && examples.input !== undefined && examples.output !== undefined) {
+        // Try to parse input as JSON if it's a string
+        let input = examples.input;
+        if (typeof input === 'string') {
+          try {
+            input = JSON.parse(input);
+          } catch (e) {
+            // If parsing fails, create a structured object
+            input = { "value": input };
+          }
+        }
+        // If input is not an object, wrap it
+        else if (typeof input !== 'object' || input === null) {
+          input = { "value": input };
+        }
+        
         testCases.push({
-          input: examples.input,
+          input: input,
           output: examples.output
         });
       }
       
       // If we have at least one test case from examples, create a couple of variations
       if (testCases.length > 0) {
-        // Add a simple baseline test case
-        testCases.push({
-          input: "Simple test input",
-          output: "Expected output for simple test"
-        });
+        // Try to determine the input structure from existing test cases
+        const sampleInput = testCases[0].input;
+        const keys = Object.keys(sampleInput);
         
-        // Add an edge case test
-        testCases.push({
-          input: "Edge case input (e.g., empty array, maximum value, etc.)",
-          output: "Expected output for edge case"
-        });
+        if (keys.length > 0) {
+          // Create variations based on the existing structure
+          if (keys.includes('nums') || keys.includes('array')) {
+            // Array-based problem
+            testCases.push({
+              input: { [keys[0]]: [1, 2, 3, 4], ...(keys[1] ? { [keys[1]]: 2 } : {}) },
+              output: "Expected output for simple test"
+            });
+            
+            testCases.push({
+              input: { [keys[0]]: [], ...(keys[1] ? { [keys[1]]: 0 } : {}) },
+              output: "Expected output for edge case"
+            });
+          } else if (keys.includes('s') || keys.includes('string')) {
+            // String-based problem
+            testCases.push({
+              input: { [keys[0]]: "test", ...(keys[1] ? { [keys[1]]: "t" } : {}) },
+              output: "Expected output for simple test"
+            });
+            
+            testCases.push({
+              input: { [keys[0]]: "", ...(keys[1] ? { [keys[1]]: "" } : {}) },
+              output: "Expected output for edge case"
+            });
+          } else {
+            // Generic structure
+            testCases.push({
+              input: { [keys[0]]: sampleInput[keys[0]] },
+              output: "Expected output for simple test"
+            });
+            
+            // Edge case
+            const edgeValue = typeof sampleInput[keys[0]] === 'number' ? 0 : 
+                             Array.isArray(sampleInput[keys[0]]) ? [] : "";
+            testCases.push({
+              input: { [keys[0]]: edgeValue },
+              output: "Expected output for edge case"
+            });
+          }
+        } else {
+          // Fallback to generic structure
+          testCases.push({
+            input: { "value": 42 },
+            output: "Expected output for simple test"
+          });
+          
+          testCases.push({
+            input: { "value": 0 },
+            output: "Expected output for edge case"
+          });
+        }
       } else {
-        // If no usable examples, create some default test cases
+        // If no usable examples, create some default test cases with varied JSON structure
         testCases.push(
-          { input: "Test input 1", output: "Expected output 1" },
-          { input: "Test input 2", output: "Expected output 2" },
-          { input: "Test input 3", output: "Expected output 3" }
+          { input: { "array": [1, 5, 8, 10, 14, 19] }, output: "Expected output 1" },
+          { input: { "string": "hello world" }, output: "Expected output 2" },
+          { input: { "n": 5, "k": 3 }, output: "Expected output 3" }
         );
       }
     } catch (e) {
       console.warn("Error generating test cases from examples", e);
-      // Fallback to default test cases
+      // Fallback to default test cases with varied JSON structure
       testCases.push(
-        { input: "Default test input 1", output: "Default expected output 1" },
-        { input: "Default test input 2", output: "Default expected output 2" }
+        { input: { "value": 42 }, output: "Default expected output 1" },
+        { input: { "array": [1, 2, 3] }, output: "Default expected output 2" }
       );
     }
     
     return testCases;
+  }
+
+  getDefaultRuntime(difficulty) {
+    if (!difficulty) return 500; // Default for medium
+    
+    switch(difficulty.toLowerCase()) {
+      case 'easy': return 300;
+      case 'medium': return 500;
+      case 'hard': return 1000;
+      default: return 500;
+    }
+  }
+
+  getDefaultMemory(difficulty) {
+    if (!difficulty) return 128; // Default for medium
+    
+    switch(difficulty.toLowerCase()) {
+      case 'easy': return 64;
+      case 'medium': return 128;
+      case 'hard': return 256;
+      default: return 128;
+    }
   }
 }
 

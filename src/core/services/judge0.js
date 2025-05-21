@@ -1,4 +1,5 @@
-import { LANGUAGES, STATUS, DEFAULT_SUBMISSION_CONFIG, JUDGE0_ENDPOINTS } from '../constants';
+import { LANGUAGES, DEFAULT_SUBMISSION_CONFIG, JUDGE0_ENDPOINTS } from '../constants';
+import axios from 'axios';
 
 class Judge0 {
   constructor() {
@@ -43,7 +44,7 @@ class Judge0 {
 
       return await response.json();
     } catch (error) {
-      console.error('Judge0 submission error:', error);
+      console.error('Judge0 submission error:', error.message);
       throw error;
     }
   }
@@ -64,7 +65,7 @@ class Judge0 {
 
       return await response.json();
     } catch (error) {
-      console.error('Judge0 get submission error:', error);
+      console.error('Judge0 get submission error:', error.message);
       throw error;
     }
   }
@@ -86,14 +87,52 @@ class Judge0 {
       
       throw new Error('Submission timeout');
     } catch (error) {
-      console.error('Judge0 wait for submission error:', error);
+      console.error('Judge0 wait for submission error:', error.message);
       throw error;
     }
   }
 
-  async runCode(options) {
-    const submission = await this.createSubmission(options);
-    return this.waitForSubmission(submission.token);
+  async runCode({ sourceCode, languageId, stdin, expectedOutput, cpuTimeLimit = 5, memoryLimit = 128000, wallTimeLimit = 10 }) {
+    try {
+      const createResponse = await axios.post(
+        `${this.baseUrl}/submissions`,
+        {
+          source_code: sourceCode,
+          language_id: languageId,
+          stdin: stdin,
+          expected_output: expectedOutput,
+          cpu_time_limit: cpuTimeLimit,
+          memory_limit: memoryLimit,
+          wall_time_limit: wallTimeLimit,
+          enable_network: false
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RapidAPI-Key': this.apiKey,
+            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+          }
+        }
+      );
+
+      const token = createResponse.data.token;
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const getResponse = await axios.get(
+        `${this.baseUrl}/submissions/${token}?fields=status_id,stdout,stderr,compile_output,message,time,memory,expected_output,exit_code,status`,
+        {
+          headers: {
+            'X-RapidAPI-Key': this.apiKey,
+            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+          }
+        }
+      );
+
+      return getResponse.data;
+    } catch (error) {
+      throw new Error(`Judge0 API error: ${error.response?.data?.error || error.message}`);
+    }
   }
 
   async createBatchSubmissions(submissions) {
@@ -124,38 +163,41 @@ class Judge0 {
 
       return await response.json();
     } catch (error) {
-      console.error('Judge0 batch submission error:', error);
+      console.error('Judge0 batch submission error:', error.message);
       throw error;
     }
   }
 
-  processSubmissionResult(result) {
-    if (!result) {
-      return {
-        isCorrect: false,
-        status: STATUS.INTERNAL_ERROR.description,
-        errorMessage: 'No result received from Judge0',
-        executionTime: 0,
-        memorySpace: 0,
-        output: '',
-        compileOutput: '',
-      };
+  processSubmissionResult(submission) {
+    // Status IDs: https://github.com/judge0/judge0/blob/master/docs/api/statuses.md
+    const isAccepted = submission.status_id === 3; // Accepted
+    const isWrongAnswer = submission.status_id === 4; // Wrong Answer
+    
+    let output = '';
+    let errorMessage = '';
+    
+    if (submission.stdout) {
+      output = submission.stdout.trim();
     }
-
-    const statusId = result.status?.id;
-    const statusDescription = Object.values(STATUS).find(s => s.id === statusId)?.description;
-    const isCorrect = statusId === STATUS.ACCEPTED.id;
-
+    
+    if (submission.stderr) {
+      errorMessage = submission.stderr;
+    } else if (submission.compile_output) {
+      errorMessage = submission.compile_output;
+    } else if (submission.message) {
+      errorMessage = submission.message;
+    } else if (isWrongAnswer) {
+      errorMessage = 'Wrong answer';
+    }
+    
     return {
-      isCorrect,
-      status: statusDescription,
-      errorMessage: result.stderr || result.message || null,
-      executionTime: result.time || 0,
-      memorySpace: result.memory || 0,
-      output: result.stdout || '',
-      compileOutput: result.compile_output || '',
-      exitCode: result.exit_code,
-      exitSignal: result.exit_signal,
+      isCorrect: isAccepted,
+      output,
+      errorMessage,
+      executionTime: parseFloat(submission.time) || 0,
+      memorySpace: parseInt(submission.memory) || 0,
+      exitCode: submission.exit_code,
+      status: submission.status?.description || 'Unknown'
     };
   }
 
@@ -171,7 +213,7 @@ class Judge0 {
       }
       return await response.json();
     } catch (error) {
-      console.error('Judge0 get languages error:', error);
+      console.error('Judge0 get languages error:', error.message);
       return Object.values(LANGUAGES).map(lang => ({ id: lang.id, name: lang.name }));
     }
   }

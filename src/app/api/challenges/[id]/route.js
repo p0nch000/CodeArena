@@ -3,7 +3,7 @@ import Challenge from '@/core/services/challenge';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const id = params.id;
     console.log('API - Fetching challenge with ID:', id);
     
     const challenge = await Challenge.getChallengeById(id);

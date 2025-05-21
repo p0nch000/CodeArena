@@ -12,8 +12,16 @@ export async function POST(req) {
       examples,
       constraints,
       test_cases = [],
-      created_by = null // Optional user ID who created the challenge
+      created_by = null, // Optional user ID who created the challenge
+      runtime,
+      memory,
+      deadline
     } = challengeData;
+
+    // Ensure difficulty is properly capitalized (e.g., "Easy", "Medium", "Hard")
+    const formattedDifficulty = difficulty ? 
+      difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase() : 
+      "Medium";
 
     // Convert examples and constraints to strings for database storage
     const examplesStr = typeof examples === 'object' ? 
@@ -22,17 +30,24 @@ export async function POST(req) {
     const constraintsStr = Array.isArray(constraints) ? 
       JSON.stringify(constraints) : String(constraints);
 
+    // Set default deadline to one week from now if not provided
+    const defaultDeadline = new Date();
+    defaultDeadline.setDate(defaultDeadline.getDate() + 7);
+    
     // Create the challenge in the database
     const newChallenge = await prisma.challenges.create({
       data: {
         title,
         description,
-        difficulty,
+        difficulty: formattedDifficulty,
         examples: examplesStr,
         constraints: constraintsStr,
         published: true,
         created_by,
-        created_at: new Date()
+        created_at: new Date(),
+        runtime: runtime || null,
+        memory: memory || null,
+        deadline: deadline || defaultDeadline
       },
     });
 
