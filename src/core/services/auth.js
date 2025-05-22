@@ -22,7 +22,8 @@ class Auth {
         id_user: true,
         password_hash: true,
         user_role: true,
-        username: true
+        username: true,
+        mail: true
       }
     });
 
@@ -40,13 +41,14 @@ class Auth {
       { 
         id_user: user.id_user,
         role: user.user_role,
-        username: user.username
+        username: user.username,
+        mail:user.mail
       }, 
       this.jwtSecret, 
       { expiresIn: '400h' }
     );
 
-    return { token, user: { id: user.id_user, username: user.username, role: user.user_role } };
+    return { token, user: { id: user.id_user, username: user.username, mail: user.mail ,role: user.user_role } };
   }
   
   async register(userData) {

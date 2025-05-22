@@ -1,5 +1,5 @@
 "use client";
-
+import React from 'react';
 import { Avatar } from "@nextui-org/react";
 import { generateAvatar } from "@/utils/avatar";
 

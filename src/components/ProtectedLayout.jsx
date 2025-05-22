@@ -1,5 +1,5 @@
 'use client'
-
+import React from 'react';
 import { useAuthRedirect } from '@/core/hooks/useAuthRedirect'
 
 export default function ProtectedLayout({ children }) {

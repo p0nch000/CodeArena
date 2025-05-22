@@ -29,17 +29,17 @@ describe('Leaderboard component', () => {
     },
   ];
 
-  it('muestra el spinner cuando isLoading es true', () => {
+  it('show spinner when isLoading is true', () => {
     render(<Leaderboard isLoading={true} users={[]} />);
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  it('muestra mensaje cuando no hay usuarios', () => {
+  it('display message when there are no users', () => {
     render(<Leaderboard isLoading={false} users={[]} />);
     expect(screen.getByText(/No users found matching your criteria/i)).toBeInTheDocument();
   });
 
-  it('renderiza usuarios con datos correctos', () => {
+  it('renders users with the right data', () => {
     render(<Leaderboard isLoading={false} users={usersMock} />);
     // Verificar nombres
     expect(screen.getByText('Alice')).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe('Leaderboard component', () => {
     expect(screen.getByText('Silver Developer')).toBeInTheDocument();
   });
 
- it('muestra los botones de paginación según totalPages y permite cambiar página', () => {
+ it('shows the pagination according the totalPages and allows to change page', () => {
   const onPageChange = jest.fn();
   const totalPages = 5;
   const currentPage = 1;
@@ -100,7 +100,7 @@ describe('Leaderboard component', () => {
 
 
 
-  it('no muestra paginación si showPagination es false', () => {
+  it('it doesnt show pagination if showPagination is false ', () => {
     render(
       <Leaderboard
         isLoading={false}
