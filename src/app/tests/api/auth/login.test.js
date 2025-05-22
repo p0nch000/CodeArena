@@ -1,4 +1,4 @@
-import { POST } from 'src/app/api/auth/login/route'
+import { POST } from '../../../api/auth/login/route'
 
 // Usa objetos Request nativos (Node 18+)
 describe('POST /api/auth/login', () => {
