@@ -1,84 +1,259 @@
-export default function CodeOutput({ runtime, memory, testCases, error }) {
-  if (error) {
+'use client';
+
+import { useState } from 'react';
+
+export default function CodeOutput({ 
+  runtime, 
+  memory, 
+  testCases = [], 
+  error, 
+  isSubmission = false,
+  submission = null 
+}) {
+  const [activeTab, setActiveTab] = useState('results');
+
+  if (isSubmission && submission) {
     return (
-      <div className="bg-rose-900/30 border border-rose-700 p-4 rounded-lg shadow-md">
-        <h3 className="text-rose-300 font-semibold mb-2 text-lg">Execution Error</h3>
-        <pre className="text-rose-200 whitespace-pre-wrap text-sm bg-slate-800 p-3 rounded-md">{error}</pre>
+      <div className="bg-[#1f2937] rounded-lg p-4 h-full">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-600">
+          <div className="flex items-center gap-3">
+            <div className={`text-2xl ${submission.isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+              {submission.isCorrect ? '✅' : '❌'}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                Submission {submission.isCorrect ? 'Accepted' : 'Failed'}
+              </h3>
+              <p className="text-sm text-slate-400">
+                Submitted on {new Date(submission.submittedAt).toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div className={`px-3 py-1 rounded text-sm font-medium ${
+            submission.isCorrect 
+              ? 'bg-green-900/30 text-green-400 border border-green-600' 
+              : 'bg-red-900/30 text-red-400 border border-red-600'
+          }`}>
+            {submission.status}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          <div className="bg-slate-800 rounded-lg p-3 text-center">
+            <div className="text-lg font-semibold text-white">{runtime}</div>
+            <div className="text-xs text-slate-400">Runtime</div>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-3 text-center">
+            <div className="text-lg font-semibold text-white">{memory}</div>
+            <div className="text-xs text-slate-400">Memory</div>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-3 text-center">
+            <div className="text-lg font-semibold text-white">
+              {testCases.filter(t => t.passed).length}/{testCases.length}
+            </div>
+            <div className="text-xs text-slate-400">Test Cases</div>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-3 text-center">
+            <div className={`text-lg font-semibold ${submission.isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+              {submission.isCorrect ? '100%' : Math.round((testCases.filter(t => t.passed).length / testCases.length) * 100) + '%'}
+            </div>
+            <div className="text-xs text-slate-400">Success Rate</div>
+          </div>
+        </div>
+
+        <div className="flex space-x-1 mb-4">
+          <button
+            onClick={() => setActiveTab('results')}
+            className={`px-4 py-2 text-sm rounded-t-lg transition ${
+              activeTab === 'results'
+                ? 'bg-slate-700 text-white border-b-2 border-blue-500'
+                : 'bg-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            Test Results
+          </button>
+          <button
+            onClick={() => setActiveTab('code')}
+            className={`px-4 py-2 text-sm rounded-t-lg transition ${
+              activeTab === 'code'
+                ? 'bg-slate-700 text-white border-b-2 border-blue-500'
+                : 'bg-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            Submitted Code
+          </button>
+        </div>
+
+        <div className="bg-slate-800 rounded-lg p-4 max-h-96 overflow-y-auto">
+          {activeTab === 'results' && (
+            <div className="space-y-3">
+              {testCases.length > 0 ? (
+                testCases.map((testCase, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-lg border-l-4 ${
+                      testCase.passed
+                        ? 'bg-green-900/20 border-green-500'
+                        : 'bg-red-900/20 border-red-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-medium text-white">
+                        Test Case {testCase.number}
+                      </span>
+                      <span className={`text-sm font-medium ${
+                        testCase.passed ? 'text-green-400' : 'text-red-400'
+                      }`}>
+                        {testCase.passed ? '✅ Passed' : '❌ Failed'}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                      <div>
+                        <div className="text-slate-400 mb-1">Input:</div>
+                        <pre className="bg-slate-900 p-2 rounded text-slate-300 text-xs overflow-x-auto">
+                          {testCase.input || 'No input'}
+                        </pre>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 mb-1">Your Output:</div>
+                        <pre className="bg-slate-900 p-2 rounded text-slate-300 text-xs overflow-x-auto">
+                          {testCase.output || 'No output'}
+                        </pre>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 mb-1">Expected:</div>
+                        <pre className="bg-slate-900 p-2 rounded text-slate-300 text-xs overflow-x-auto">
+                          {testCase.expectedOutput}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {testCase.errorMessage && (
+                      <div className="mt-3">
+                        <div className="text-red-400 text-sm mb-1">Error:</div>
+                        <pre className="bg-red-900/20 p-2 rounded text-red-300 text-xs overflow-x-auto">
+                          {testCase.errorMessage}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-slate-400 py-8">
+                  No test case results available
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'code' && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-white font-medium">Your Submitted Code</h4>
+                <span className="text-sm text-slate-400">
+                  Language: {submission.language || 'Unknown'}
+                </span>
+              </div>
+              <pre className="bg-slate-900 p-4 rounded text-sm text-slate-300 overflow-x-auto border border-slate-700">
+                <code>{submission.code || 'No code available'}</code>
+              </pre>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
-
-  if (!testCases || testCases.length === 0) {
-    return (
-      <div className="text-slate-500 italic p-4 text-center">
-        Run your code or submit a solution to see the results here.
-      </div>
-    );
-  }
-
-  const passedCount = testCases.filter(tc => tc.passed).length;
-  const totalCount = testCases.length;
-  const allPassed = passedCount === totalCount;
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm p-3 bg-slate-700/50 rounded-lg shadow">
-        <div className="flex space-x-6 mb-2 sm:mb-0">
-          <div>
-            <span className="text-slate-400">Runtime:</span> <span className="text-slate-200 font-medium">{runtime}</span>
-          </div>
-          <div>
-            <span className="text-slate-400">Memory:</span> <span className="text-slate-200 font-medium">{memory}</span>
-          </div>
+    <div className="bg-[#1f2937] rounded-lg p-4 h-full">
+      {error ? (
+        <div className="text-red-400 bg-red-900/20 p-4 rounded-lg border border-red-600">
+          <div className="font-medium mb-2">❌ Error</div>
+          <pre className="text-sm whitespace-pre-wrap">{error}</pre>
         </div>
-        <div className={`font-semibold ${allPassed ? "text-emerald-400" : "text-rose-400"}`}>
-          {passedCount}/{totalCount} test cases passed
-        </div>
-      </div>
+      ) : (
+        <>
+          {(runtime || memory) && (
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="bg-slate-800 rounded-lg p-3 text-center">
+                <div className="text-lg font-semibold text-white">{runtime || 'N/A'}</div>
+                <div className="text-xs text-slate-400">Runtime</div>
+              </div>
+              <div className="bg-slate-800 rounded-lg p-3 text-center">
+                <div className="text-lg font-semibold text-white">{memory || 'N/A'}</div>
+                <div className="text-xs text-slate-400">Memory</div>
+              </div>
+              <div className="bg-slate-800 rounded-lg p-3 text-center">
+                <div className="text-lg font-semibold text-white">
+                  {testCases.filter(t => t.passed).length}/{testCases.length}
+                </div>
+                <div className="text-xs text-slate-400">Test Cases</div>
+              </div>
+            </div>
+          )}
 
-      <div className="space-y-4">
-        {testCases.map((testCase) => (
-          <div 
-            key={testCase.number} 
-            className={`p-4 rounded-lg shadow-md border ${testCase.passed ? 'bg-emerald-600/10 border-emerald-500/30' : 'bg-rose-600/10 border-rose-500/30'}`}
-          >
-            <div className="flex justify-between items-center mb-3">
-              <div className="font-semibold text-slate-200">
-                Test Case {testCase.number}
-              </div>
-              <span className={`px-3 py-1 text-xs font-bold rounded-full ${testCase.passed ? 'bg-emerald-500/80 text-emerald-50' : 'bg-rose-500/80 text-rose-50'}`}>
-                {testCase.passed ? "PASSED" : "FAILED"}
-              </span>
-            </div>
-            
-            <div className="space-y-3 text-sm">
-              <div>
-                <div className="text-slate-400 mb-1 font-medium">Input:</div>
-                <pre className="bg-slate-800 p-3 rounded text-slate-300 whitespace-pre-wrap">{testCase.input}</pre>
-              </div>
-              
-              <div>
-                <div className="text-slate-400 mb-1 font-medium">Expected Output:</div>
-                <pre className="bg-slate-800 p-3 rounded text-slate-300 whitespace-pre-wrap">{testCase.expectedOutput}</pre>
-              </div>
-              
-              {!testCase.passed && testCase.output !== undefined && (
-                <div>
-                  <div className="text-slate-400 mb-1 font-medium">Your Output:</div>
-                  <pre className="bg-slate-800 p-3 rounded text-rose-300 whitespace-pre-wrap">{testCase.output || "No output"}</pre>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {testCases.length > 0 ? (
+              testCases.map((testCase, index) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-lg border-l-4 ${
+                    testCase.passed
+                      ? 'bg-green-900/20 border-green-500'
+                      : 'bg-red-900/20 border-red-500'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium text-white">
+                      Test Case {testCase.number}
+                    </span>
+                    <span className={`text-sm font-medium ${
+                      testCase.passed ? 'text-green-400' : 'text-red-400'
+                    }`}>
+                      {testCase.passed ? '✅ Passed' : '❌ Failed'}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                    <div>
+                      <div className="text-slate-400 mb-1">Input:</div>
+                      <pre className="bg-slate-900 p-2 rounded text-slate-300 text-xs overflow-x-auto">
+                        {testCase.input || 'No input'}
+                      </pre>
+                    </div>
+                    <div>
+                      <div className="text-slate-400 mb-1">Your Output:</div>
+                      <pre className="bg-slate-900 p-2 rounded text-slate-300 text-xs overflow-x-auto">
+                        {testCase.output || 'No output'}
+                      </pre>
+                    </div>
+                    <div>
+                      <div className="text-slate-400 mb-1">Expected:</div>
+                      <pre className="bg-slate-900 p-2 rounded text-slate-300 text-xs overflow-x-auto">
+                        {testCase.expectedOutput}
+                      </pre>
+                    </div>
+                  </div>
+
+                  {testCase.errorMessage && (
+                    <div className="mt-3">
+                      <div className="text-red-400 text-sm mb-1">Error:</div>
+                      <pre className="bg-red-900/20 p-2 rounded text-red-300 text-xs overflow-x-auto">
+                        {testCase.errorMessage}
+                      </pre>
+                    </div>
+                  )}
                 </div>
-              )}
-              
-              {testCase.errorMessage && (
-                <div>
-                  <div className="text-rose-400 mb-1 font-medium">Error Message:</div>
-                  <pre className="bg-slate-800 p-3 rounded whitespace-pre-wrap text-rose-300">{testCase.errorMessage}</pre>
-                </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="text-center text-slate-400 py-8">
+                Click "Run Code" to see test results
+              </div>
+            )}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }

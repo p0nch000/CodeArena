@@ -10,14 +10,14 @@ export default function CodeChallengeFull({ challenge }) {
 
     // Mapeo de puntos según dificultad
     const difficultyPoints = {
-        'Easy': 100,
-        'Medium': 200,
-        'Hard': 300
+        'Easy': 50,
+        'Medium': 100,
+        'Hard': 150
     };
 
     // Obtener el color de badge y los puntos según la dificultad
     const badgeColor = challenge.badgeColor || badgeColors[challenge.difficulty] || badgeColors['Medium'];
-    const points = challenge.points || difficultyPoints[challenge.difficulty] || 200;
+    const points = challenge.points || difficultyPoints[challenge.difficulty] || 100;
     
     // Extraer solo la fecha del deadline (formato YYYY-MM-DD)
     const formattedDeadline = challenge.deadline ? challenge.deadline.split('T')[0] : '';

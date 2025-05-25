@@ -6,7 +6,7 @@ import { wrapCodeForJudge0 } from '@/core/utils/codeWrapper';
 
 export async function POST(request, { params }) {
   try {
-    const id = params.id;
+    const id = await params.id;
     
     let body;
     try {

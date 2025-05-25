@@ -13,6 +13,7 @@ import {
   getLanguageByName, 
   getCodeTemplate 
 } from '@/core/constants';
+import { useAuthRedirect } from '@/core/hooks/useAuthRedirect';
 
 const MonacoEditor = dynamic(() => import('./components/MonacoEditor'), { ssr: false });
 
@@ -34,15 +35,32 @@ async function getProblemData(id) {
   }
 }
 
+async function checkUserSubmission(challengeId, userId) {
+  try {
+    const response = await fetch(`/api/challenges/${challengeId}/submission-status?userId=${userId}`, {
+      cache: 'no-store'
+    });
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return { hasSubmitted: false, submission: null };
+  }
+}
+
 export default function CodeChallengeSolve() {
   const params = useParams();
+  const { user, loading } = useAuthRedirect();
   const [id, setId] = useState(null);
   const [problemData, setProblemData] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES.JAVASCRIPT_NODE.name);
   const [isRunning, setIsRunning] = useState(false);
   const [runResults, setRunResults] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResults, setSubmitResults] = useState(null);
   const [code, setCode] = useState('');
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [submissionData, setSubmissionData] = useState(null);
   const languageOptions = getLanguageOptions();
   
   useEffect(() => {
@@ -63,11 +81,32 @@ export default function CodeChallengeSolve() {
   }, [id]);
 
   useEffect(() => {
-    const template = getCodeTemplate(selectedLanguage);
-    setCode(template);
-  }, [selectedLanguage]);
+    async function checkSubmissionStatus() {
+      const userId = user?.id;
+      if (id && userId) {
+        const data = await checkUserSubmission(id, userId);
+        setHasSubmitted(data.hasSubmitted);
+        setSubmissionData(data.submission);
+        
+        if (data.hasSubmitted && data.submission) {
+          setCode(data.submission.code);
+          setSelectedLanguage(data.submission.language);
+        }
+      }
+    }
+    
+    checkSubmissionStatus();
+  }, [id, user]);
+
+  useEffect(() => {
+    if (!hasSubmitted) {
+      const template = getCodeTemplate(selectedLanguage);
+      setCode(template);
+    }
+  }, [selectedLanguage, hasSubmitted]);
 
   const handleLanguageChange = (value) => {
+    if (hasSubmitted) return;
     setSelectedLanguage(value);
   };
 
@@ -78,6 +117,7 @@ export default function CodeChallengeSolve() {
   const handleRunCode = async () => {
     try {
       setIsRunning(true);
+      setSubmitResults(null);
       
       if (!code || code.trim() === '') {
         setRunResults({
@@ -109,37 +149,139 @@ export default function CodeChallengeSolve() {
           memory: `${(avgMemSpace / 1024).toFixed(2)} MB`,
           testCases: data.results ? data.results.map((result, index) => ({
             number: index + 1,
-            passed: result.passed || false,
-            input: result.input || '',
-            output: result.output || '',
-            expectedOutput: result.expectedOutput || '',
-            errorMessage: result.errorMessage || ''
+            passed: result.passed,
+            input: result.input,
+            output: result.output,
+            expectedOutput: result.expectedOutput,
+            errorMessage: result.errorMessage
           })) : []
         };
         
         setRunResults(formattedResults);
       } else {
         setRunResults({
-          error: data.error || 'Unknown error running code.',
+          error: data.error || 'An error occurred while running your code.',
           testCases: []
         });
       }
     } catch (error) {
       setRunResults({
-        error: 'An error occurred while running your code.',
+        error: 'Network error. Please try again.',
         testCases: []
       });
     } finally {
       setIsRunning(false);
     }
   };
-  
+
   const handleSubmit = async () => {
-    // Submission functionality is disabled for now
-    alert("Submission functionality is coming soon!");
+    const userId = user?.id;
+    
+    if (!userId) {
+      setSubmitResults({
+        error: 'You must be logged in to submit. Please refresh the page and try again.',
+        testCases: []
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      
+      if (!code || code.trim() === '') {
+        setSubmitResults({
+          error: 'Please write some code before submitting.',
+          testCases: []
+        });
+        return;
+      }
+      
+      const response = await fetch(`/api/challenges/${id}/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: code,
+          language: selectedLanguage,
+          userId: userId
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        const avgExecTime = data.summary?.avgExecutionTime || 0;
+        const avgMemSpace = data.summary?.avgMemorySpace || 0;
+        
+        const formattedResults = {
+          runtime: `${avgExecTime.toFixed(2)}ms`,
+          memory: `${(avgMemSpace / 1024).toFixed(2)} MB`,
+          isSubmission: true,
+          submission: {
+            ...data.submission,
+            code: code,
+            language: selectedLanguage
+          },
+          testCases: data.results ? data.results.map((result, index) => ({
+            number: index + 1,
+            passed: result.passed,
+            input: result.input,
+            output: result.output,
+            expectedOutput: result.expectedOutput,
+            errorMessage: result.errorMessage
+          })) : []
+        };
+        
+        setSubmitResults(formattedResults);
+        setHasSubmitted(true);
+        
+        const submissionStatus = await checkUserSubmission(id, userId);
+        setSubmissionData(submissionStatus.submission);
+      } else {
+        setSubmitResults({
+          error: data.error || 'An error occurred while submitting your code.',
+          testCases: []
+        });
+      }
+    } catch (error) {
+      setSubmitResults({
+        error: 'Network error. Please try again.',
+        testCases: []
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const currentLanguage = getCurrentLanguage();
+  
+  let displayResults = null;
+  if (submitResults) {
+    displayResults = submitResults;
+  } else if (runResults) {
+    displayResults = runResults;
+  } else if (hasSubmitted && submissionData) {
+    displayResults = {
+      runtime: `${submissionData.summary.avgExecutionTime.toFixed(2)}ms`,
+      memory: `${(submissionData.summary.avgMemorySpace / 1024).toFixed(2)} MB`,
+      isSubmission: true,
+      submission: submissionData,
+      testCases: submissionData.testResults || []
+    };
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#0f1729] text-white">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col w-full h-screen bg-[#0f1729] text-white font-mono">
@@ -151,7 +293,7 @@ export default function CodeChallengeSolve() {
         <div className="flex-1 flex flex-col h-full overflow-hidden mr-6">
           <PanelGroup direction="vertical" className="h-full">
             <div className="bg-[#1f2937] rounded-t-lg px-2 pt-2 mt-6 flex items-center border-b border-slate-700">
-              <div className="ml-3 pb-2 flex space-x-2">
+              <div className="ml-3 pb-2">
                 <Dropdown
                   options={languageOptions}
                   label=""
@@ -159,6 +301,7 @@ export default function CodeChallengeSolve() {
                   onChange={handleLanguageChange}
                   className="w-48"
                   color="dark-blue-dropdown"
+                  disabled={hasSubmitted}
                 />
               </div>
             </div>
@@ -180,7 +323,8 @@ export default function CodeChallengeSolve() {
                       glyphMargin: false,
                       folding: true,
                       lineDecorationsWidth: 10,
-                      fontSize: 14
+                      fontSize: 14,
+                      readOnly: false
                     }}
                   />
                 </div>
@@ -200,8 +344,8 @@ export default function CodeChallengeSolve() {
                   <div className="flex space-x-2">
                     <button 
                       onClick={handleRunCode}
-                      disabled={isRunning}
-                      className={`flex items-center gap-1 ${isRunning ? 'bg-slate-500 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'} text-white px-3 py-1 text-sm rounded transition`}
+                      disabled={isRunning || isSubmitting}
+                      className={`flex items-center gap-1 ${(isRunning || isSubmitting) ? 'bg-slate-500 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'} text-white px-3 py-1 text-sm rounded transition`}
                     >
                       {isRunning ? (
                         <>
@@ -215,15 +359,27 @@ export default function CodeChallengeSolve() {
                     </button>
                     <button 
                       onClick={handleSubmit}
-                      disabled={true}
-                      className="flex items-center gap-1 bg-slate-500 cursor-not-allowed text-white px-3 py-1 text-sm rounded transition"
-                      title="Coming soon"
+                      disabled={isSubmitting || isRunning || hasSubmitted}
+                      className={`flex items-center gap-1 ${(isSubmitting || isRunning || hasSubmitted) ? 'bg-slate-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'} text-white px-3 py-1 text-sm rounded transition`}
+                      title={hasSubmitted ? "You have already submitted for this challenge" : ""}
                     >
-                      <span>↗</span> Submit (Coming Soon)
+                      {isSubmitting ? (
+                        <>
+                          <span className="animate-spin">⟳</span> Submitting...
+                        </>
+                      ) : hasSubmitted ? (
+                        <>
+                          <span>✅</span> Already Submitted
+                        </>
+                      ) : (
+                        <>
+                          <span>↗</span> Submit
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
-                <CodeOutput {...runResults} />
+                <CodeOutput {...displayResults} />
               </div>
             </Panel>
           </PanelGroup>
