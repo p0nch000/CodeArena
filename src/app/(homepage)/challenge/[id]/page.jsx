@@ -7,6 +7,12 @@ import ProblemStatement from './components/ProblemStatement';
 import CodeOutput from './components/Output';
 import Dropdown from '@/components/Dropdown';
 import dynamic from 'next/dynamic';
+import { 
+  LANGUAGES, 
+  getLanguageOptions, 
+  getLanguageByName, 
+  getCodeTemplate 
+} from '@/core/constants';
 
 const MonacoEditor = dynamic(() => import('./components/MonacoEditor'), { ssr: false });
 
@@ -32,11 +38,12 @@ export default function CodeChallengeSolve() {
   const params = useParams();
   const [id, setId] = useState(null);
   const [problemData, setProblemData] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('JavaScript (Node.js 12.14.0)');
+  const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES.JAVASCRIPT_NODE.name);
   const [isRunning, setIsRunning] = useState(false);
   const [runResults, setRunResults] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [code, setCode] = useState('');
+  const languageOptions = getLanguageOptions();
   
   useEffect(() => {
     if (params?.id) {
@@ -55,144 +62,17 @@ export default function CodeChallengeSolve() {
     fetchProblemData();
   }, [id]);
 
-  const languageOptions = [
-    "JavaScript (Node.js 12.14.0)",
-    "JavaScript (Node.js 22.08.0)",
-    "Python (3.8.1)",
-    "Python (3.12.5)",
-    "C++ (GCC 9.2.0)",
-    "C++ (GCC 14.1.0)",
-  ];
-
-  const monacoLanguageMap = {
-    "JavaScript (Node.js 12.14.0)": 'javascript',
-    "JavaScript (Node.js 22.08.0)": 'javascript',
-    "Python (3.8.1)": 'python',
-    "Python (3.12.5)": 'python',
-    "C++ (GCC 9.2.0)": 'cpp',
-    "C++ (GCC 14.1.0)": 'cpp',
-  };
-
-  const codeTemplates = {
-    "JavaScript (Node.js 12.14.0)": `/**
- * Solution to the problem
- * @param {Object} input - Object with the problem input (fields depend on the problem).
- * @return {*} - The expected result for the problem.
- */
-function solution(input) {
-  // You can access input fields, for example:
-  // const { nums, target } = input;
-  // Check the problem statement to see which fields are available.
-  let result;
-
-  return result;
-}`,
-
-    "JavaScript (Node.js 22.08.0)": `/**
- * Solution to the problem
- * @param {Object} input - Object with the problem input (fields depend on the problem).
- * @return {*} - The expected result for the problem.
- */
-function solution(input) {
-  // You can access input fields, for example:
-  // const { nums, target } = input;
-  // Check the problem statement to see which fields are available.
-  let result;
-
-  return result;
-}`,
-
-    "Python (3.8.1)": `def solution(**kwargs):
-    """
-    Solution to the problem
-
-    Args:
-        The arguments depend on the problem (see the statement).
-
-    Returns:
-        The expected result for the problem.
-    """
-    # You can access input fields, for example:
-    # nums = kwargs.get("nums")
-    # target = kwargs.get("target")
-    # Check the problem statement to see which fields are available.
-    result = None
-
-    return result`,
-
-    "Python (3.12.5)": `def solution(**kwargs):
-    """
-    Solution to the problem
-
-    Args:
-        The arguments depend on the problem (see the statement).
-
-    Returns:
-        The expected result for the problem.
-    """
-    # You can access input fields, for example:
-    # nums = kwargs.get("nums")
-    # target = kwargs.get("target")
-    # Check the problem statement to see which fields are available.
-    result = None
-
-    return result`,
-
-    "C++ (GCC 9.2.0)": `/**
- * Solución al problema
- */
-#include <string>
-#include <vector>
-#include <sstream>
-
-auto solution(std::string input) {
-    // std::stringstream ss(input);
-    // int num;
-    // std::vector<int> numbers;
-    // while (ss >> num) {
-    //     numbers.push_back(num);
-    // }
-
-    // std::stringstream ss_lines(input);
-    // std::string line;
-    // while (std::getline(ss_lines, line, '\\n')) {
-    //    // procesar line
-    // }
-    
-    return ""; 
-}`,
-
-    "C++ (GCC 14.1.0)": `/**
- * Solución al problema
- */
-#include <string>
-#include <vector>
-#include <sstream>
-
-auto solution(std::string input) {
-    // std::stringstream ss(input);
-    // int num;
-    // std::vector<int> numbers;
-    // while (ss >> num) {
-    //     numbers.push_back(num);
-    // }
-
-    // std::stringstream ss_lines(input);
-    // std::string line;
-    // while (std::getline(ss_lines, line, '\\n')) {
-    //    // procesar line
-    // }
-    
-    return "";
-}`,
-  };
-
   useEffect(() => {
-    setCode(codeTemplates[selectedLanguage] || `// Select a language to see the template.`);
+    const template = getCodeTemplate(selectedLanguage);
+    setCode(template);
   }, [selectedLanguage]);
 
   const handleLanguageChange = (value) => {
     setSelectedLanguage(value);
+  };
+
+  const getCurrentLanguage = () => {
+    return getLanguageByName(selectedLanguage);
   };
 
   const handleRunCode = async () => {
@@ -207,8 +87,6 @@ auto solution(std::string input) {
         return;
       }
       
-      const languageName = selectedLanguage;
-      
       const response = await fetch(`/api/challenges/${id}/run`, {
         method: 'POST',
         headers: {
@@ -216,7 +94,7 @@ auto solution(std::string input) {
         },
         body: JSON.stringify({
           code: code,
-          language: languageName
+          language: selectedLanguage
         }),
       });
       
@@ -259,64 +137,9 @@ auto solution(std::string input) {
   const handleSubmit = async () => {
     // Submission functionality is disabled for now
     alert("Submission functionality is coming soon!");
-    
-    // Original submission code is commented out
-    /*
-    try {
-      setIsSubmitting(true);
-      
-      const response = await fetch(`/api/challenges/${id}/submit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code,
-          language: selectedLanguage
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        const formattedResults = {
-          runtime: `${data.summary.avgExecutionTime.toFixed(2)}ms`,
-          memory: `${(data.summary.avgMemorySpace / 1024).toFixed(2)} MB`,
-          testCases: data.results.map((result, index) => ({
-            number: index + 1,
-            passed: result.passed,
-            input: "Hidden for submitted solution",
-            output: result.output,
-            expectedOutput: "Hidden for submitted solution",
-            errorMessage: result.errorMessage
-          })),
-          submissionId: data.submissionId,
-          allPassed: data.summary.allPassed
-        };
-        
-        setRunResults(formattedResults);
-        
-        if (data.summary.allPassed) {
-          alert("Congratulations! All tests passed.");
-        }
-      } else {
-        alert(`Error submitting: ${data.error}`);
-        setRunResults({
-          error: `Submission Error: ${data.error}`,
-          testCases: []
-        });
-      }
-    } catch (error) {
-      alert('An error occurred while submitting your code');
-      setRunResults({
-        error: 'An error occurred while submitting your code.',
-        testCases: []
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-    */
   };
+
+  const currentLanguage = getCurrentLanguage();
 
   return (
     <div className="flex flex-col w-full h-screen bg-[#0f1729] text-white font-mono">
@@ -344,7 +167,7 @@ auto solution(std::string input) {
               <div className="h-full">
                 <div className="h-full p-4 overflow-y-auto rounded-xl">
                   <MonacoEditor
-                    language={monacoLanguageMap[selectedLanguage] || 'plaintext'}
+                    language={currentLanguage?.monacoLanguage || 'plaintext'}
                     value={code}
                     onChange={(newValue) => {
                       setCode(newValue);

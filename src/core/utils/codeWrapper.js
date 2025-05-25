@@ -94,76 +94,47 @@ except Exception as e_outer:
 #include <vector>
 #include <sstream>
 #include <unordered_map>
+#include <typeinfo>
 
 ${code} // User's solution code
 
-// Simple JSON parser for this specific use case
-std::vector<int> parseNumsArray(const std::string& json) {
-  std::vector<int> nums;
-  size_t numsStart = json.find("\"nums\"");
-  if (numsStart == std::string::npos) return nums;
-  
-  size_t arrayStart = json.find('[', numsStart);
-  size_t arrayEnd = json.find(']', arrayStart);
-  
-  if (arrayStart == std::string::npos || arrayEnd == std::string::npos) return nums;
-  
-  std::string numsStr = json.substr(arrayStart + 1, arrayEnd - arrayStart - 1);
-  std::stringstream ss(numsStr);
-  std::string item;
-  
-  while (std::getline(ss, item, ',')) {
-    nums.push_back(std::stoi(item));
+// Helper function to output vector<int> as JSON array
+void outputVector(const std::vector<int>& vec) {
+  std::cout << "[";
+  for (size_t i = 0; i < vec.size(); i++) {
+    std::cout << vec[i];
+    if (i < vec.size() - 1) std::cout << ",";
   }
-  
-  return nums;
-}
-
-int parseTarget(const std::string& json) {
-  size_t targetStart = json.find("\"target\"");
-  if (targetStart == std::string::npos) return 0;
-  
-  size_t colonPos = json.find(':', targetStart);
-  if (colonPos == std::string::npos) return 0;
-  
-  size_t valueStart = json.find_first_not_of(" \\t\\n\\r", colonPos + 1);
-  if (valueStart == std::string::npos) return 0;
-  
-  std::string targetStr;
-  for (size_t i = valueStart; i < json.size(); i++) {
-    if (json[i] == ',' || json[i] == '}') break;
-    targetStr += json[i];
-  }
-  
-  return std::stoi(targetStr);
+  std::cout << "]";
 }
 
 int main() {
-  // Read all input
-  std::string input;
-  std::string line;
-  while (std::getline(std::cin, line)) {
-    input += line;
-  }
-  
   try {
-    // Parse input manually
-    std::vector<int> nums = parseNumsArray(input);
-    int target = parseTarget(input);
-    
-    // Call user's solution
-    std::vector<int> result = solution(nums, target);
-    
-    // Format output as JSON array
-    std::cout << "[";
-    for (size_t i = 0; i < result.size(); i++) {
-      std::cout << result[i];
-      if (i < result.size() - 1) std::cout << ",";
+    // Read all input as a single string
+    std::string input;
+    std::string line;
+    while (std::getline(std::cin, line)) {
+      input += line + "\\n";
     }
-    std::cout << "]" << std::endl;
+    
+    // Remove trailing newline if present
+    if (!input.empty() && input.back() == '\\n') {
+      input.pop_back();
+    }
+    
+    // Call user's solution function with the input string
+    auto result = solution(input);
+    
+    // Output the result - since most competitive programming problems
+    // return vector<int> for array results, we'll format it as JSON
+    outputVector(result);
+    std::cout << std::endl;
     
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
+    return 1;
+  } catch (...) {
+    std::cerr << "Unknown error occurred" << std::endl;
     return 1;
   }
   
