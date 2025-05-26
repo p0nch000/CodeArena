@@ -2,6 +2,7 @@
 
 import { Chip } from "@nextui-org/react";
 import { generateAvatar } from "@/utils/avatar";
+import { useRouter } from "next/navigation";
 
 function getBadgeStyles(rank) {
   if (!rank) return {
@@ -56,6 +57,12 @@ export function TopLeaderboard({ topUsers = [] }) {
       </div>
     );
   }
+  const router = useRouter();
+
+  const handleUserClick = (userId) => {
+    router.push(`/profile/${userId}`);
+  };
+
 
   return (
     <div className="w-full">
@@ -106,7 +113,8 @@ export function TopLeaderboard({ topUsers = [] }) {
                         }}
                       />
                     </div>
-                    <span className="text-white font-medium">{user.name}</span>
+                    <span onClick={() => handleUserClick(user.id)} className="text-sm font-medium text-white truncate max-w-[120px] cursor-pointer hover:text-red-400 transition-colors">{user.name}
+                    </span>
                   </div>
                 </td>
                 <td className="py-3 px-4 text-center text-sm text-gray-300">{user.challenges}</td>
