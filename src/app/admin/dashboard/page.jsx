@@ -8,12 +8,9 @@ import SubmissionsAreaChart from './components/SubmissionsAreaChart';
 import { CodeBracketIcon, UsersIcon, DocumentTextIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import Link from "next/link";
 import ChallengeMetricsTable from "./components/ChallengeMetricsTable";
-import Challenge from "@/app/(homepage)/challenge/page";
 import { Pagination } from "@nextui-org/react";
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'; // Añade esta importación si no está
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'; 
 
-// Función formateadora para los valores del gráfico
-const valueFormatter = (item) => `${item.value}%`;
 
 export default function AdminDashboard() {
   

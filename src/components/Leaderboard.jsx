@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { generateAvatar } from "@/utils/avatar";
+import { useRouter } from "next/navigation";
 
 function getBadgeStyles(rank) {
   if (!rank) return {
@@ -70,6 +71,7 @@ export default function Leaderboard({
 
 }) {
   const [internalPage, setInternalPage] = useState(currentPage);
+  const router = useRouter();
 
     // Actualizar el estado interno cuando cambia el prop
     useEffect(() => {
@@ -104,6 +106,10 @@ export default function Leaderboard({
     return ((currentPage - 1) * 10) + idx + 1;
   };
 
+  const handleUserClick = (userId) => {
+    router.push(`/profile/${userId}`);
+  };
+
   return (
     <div className="w-full mb-0 pb-0">
       <div className="w-full rounded-xl overflow-hidden shadow-md border border-zinc-800 bg-mahindra-dark-blue">
@@ -129,14 +135,13 @@ export default function Leaderboard({
             {users.map((user, idx) => {
               const { backgroundColor, textColor } = getBadgeStyles(user.rank);
               const rankBadgeImage = getRankBadgeImage(user.rank);
-
-              // Calculate the global rank based on the current page and index
               const globalRank = calculateGlobalRank(idx);
 
               return (
                 <TableRow 
                   key={user.id} 
-                  className="group cursor-pointer hover:bg-red-500/10"
+                  className="group cursor-pointer hover:bg-red-500/10 transition-all duration-200"
+                  onClick={() => handleUserClick(user.id)}
                 >
                   <TableCell className="text-red-400 font-semibold group-hover:text-red-300">#{globalRank}</TableCell>
                   <TableCell>
@@ -146,27 +151,27 @@ export default function Leaderboard({
                         size="sm"
                         isBordered
                         color="danger"
-                        className="mr-2"
+                        className="mr-2 group-hover:scale-105 transition-transform"
                       />
-                      <span className="text-mahindra-white font-medium">{user.name}</span>
+                      <span className="text-mahindra-white font-medium group-hover:text-red-300 transition-colors">{user.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{user.challenges}</TableCell>
-                  <TableCell>{user.points.toLocaleString()}</TableCell>
+                  <TableCell className="group-hover:text-white transition-colors">{user.challenges}</TableCell>
+                  <TableCell className="group-hover:text-white transition-colors">{user.points.toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex justify-center items-center space-x-2">
                       {rankBadgeImage && (
                         <img 
                           src={rankBadgeImage} 
                           alt={user.rank} 
-                          className="w-8 h-8 object-contain" 
+                          className="w-8 h-8 object-contain group-hover:scale-105 transition-transform" 
                         />
                       )}
                       <Chip
                         variant="shadow"
                         size="sm"
                         classNames={{
-                          base: "px-3 py-1.5",
+                          base: "px-3 py-1.5 group-hover:scale-105 transition-transform",
                           content: "font-semibold tracking-wide",
                         }}
                         style={{

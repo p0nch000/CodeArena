@@ -35,6 +35,7 @@ class User {
                 include: {
                     challenges: {
                         select: {
+                            id_challenge: true,
                             title: true,
                             difficulty: true
                         }
@@ -58,10 +59,20 @@ class User {
                     id_user: id,
                     is_correct: true
                 },
-                select: {
-                    challenges: true
+                include: {
+                    challenges: {
+                        select: {
+                            id_challenge: true,
+                            title: true,
+                            difficulty: true,
+                            description: true
+                        }
+                    }
                 },
-                distinct: ['id_challenge']
+                distinct: ['id_challenge'],
+                orderBy: {
+                    submitted_at: 'desc'
+                }
             });
             
             return solvedChallenges.map(sub => sub.challenges);
@@ -93,6 +104,35 @@ class User {
         } catch (error) {
             console.error("Error fetching user rank:", error);
             return null;
+        }
+    }
+
+    async getUserCorrectSubmissions(userId) {
+        try {
+            const submissions = await prisma.submissions.findMany({
+                where: {
+                    id_user: userId,
+                    is_correct: true
+                },
+                include: {
+                    challenges: {
+                        select: {
+                            id_challenge: true,
+                            title: true,
+                            difficulty: true
+                        }
+                    }
+                },
+                distinct: ['id_challenge'],
+                orderBy: {
+                    submitted_at: 'desc'
+                }
+            });
+            
+            return submissions;
+        } catch (error) {
+            console.error('Error fetching user correct submissions:', error);
+            throw error;
         }
     }
 }

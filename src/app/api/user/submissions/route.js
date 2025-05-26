@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import User from '@/core/services/user';
+import { prisma } from '@/core/db/prisma';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')) : 50;
     
     if (!userId) {
       return NextResponse.json(
@@ -13,16 +14,25 @@ export async function GET(request) {
       );
     }
     
-    const submissions = await User.getUserSubmissions(userId);
-    const limit = searchParams.get('limit');
-    const limitedSubmissions = limit ? submissions.slice(0, Number.parseInt(limit)) : submissions;
+    const submissions = await prisma.submissions.findMany({
+      where: { id_user: userId },
+      include: {
+        challenges: {
+          select: {
+            id_challenge: true,
+            title: true,
+            difficulty: true
+          }
+        }
+      },
+      orderBy: {
+        submitted_at: 'desc'
+      },
+      take: limit
+    });
     
     return NextResponse.json(
-      { 
-        success: true, 
-        submissions: limitedSubmissions,
-        total: submissions.length
-      },
+      { success: true, submissions },
       { status: 200 }
     );
     

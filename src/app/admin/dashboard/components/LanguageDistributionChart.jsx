@@ -2,15 +2,19 @@ import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const LanguageDistributionChart = ({ data }) => {
-  // Colores más suaves para el gráfico
-  const colors = [
-    '#e34142', // rojo rosado oscuro
-    '#397dec', // azul oscuro
-    '#E6B000', // amarillo dorado
-    '#21bc5b', // turquesa oscuro
-    '#9a4ee3', // morado oscuro
-    '#CC7A00',  // gris
-  ];
+  // Function to get color based on language name - darker tech-vibe colors
+  const getColorForLanguage = (languageName) => {
+    switch (languageName) {
+      case 'JavaScript':
+        return '#d97706'; // Dark amber/orange - tech energy
+      case 'Python':
+        return '#0891b2'; // Dark cyan - deep tech blue
+      case 'C++':
+        return '#be185d'; // Dark magenta/pink - bold tech accent
+      default:
+        return '#7c3aed'; // Dark purple for any other language
+    }
+  };
 
   return (
     <div className="h-full w-full">
@@ -26,7 +30,10 @@ const LanguageDistributionChart = ({ data }) => {
           label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+            <Cell 
+              key={`cell-${index}`} 
+              fill={getColorForLanguage(entry.label)} 
+            />
           ))}
         </Pie>
         <Legend 

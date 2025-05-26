@@ -8,9 +8,9 @@ export default function CodeChallenge( {challenge }) {
     };
 
     const difficultyBasePoints = {
-        Easy: 100,
-        Medium: 200,
-        Hard: 300
+        Easy: 50,
+        Medium: 100,
+        Hard: 150
     }
 
     const badgeColor = difficultyColors[challenge?.difficulty];

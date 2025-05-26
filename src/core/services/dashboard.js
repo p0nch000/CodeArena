@@ -99,29 +99,76 @@ class Dashboard {
 
   async getLanguageDistribution() {
     try {
-      // Get total submissions count
-      const totalSubmissions = await prisma.submissions.count();
+      // Define the exact language names from constants that we want to show
+      const allowedLanguages = [
+        // JavaScript variants
+        'JavaScript (Node.js 12.14.0)',
+        'JavaScript (Node.js 18.15.0)', 
+        'JavaScript (Node.js 20.17.0)',
+        'JavaScript (Node.js 22.08.0)',
+        // Python variants
+        'Python (3.8.1)',
+        'Python (3.11.2)',
+        'Python (3.12.5)',
+        // C++ variants
+        'C++ (GCC 9.2.0)',
+        'C++ (GCC 14.1.0)'
+      ];
+      
+      // Get total submissions count for allowed languages only
+      const totalSubmissions = await prisma.submissions.count({
+        where: {
+          programming_language: {
+            in: allowedLanguages
+          }
+        }
+      });
       
       // If there are no submissions, return empty data
       if (totalSubmissions === 0) {
         return [];
       }
       
-      // Get counts by language
+      // Get counts by language for allowed languages only
       const languageCounts = await prisma.submissions.groupBy({
         by: ['programming_language'],
         _count: {
           programming_language: true
+        },
+        where: {
+          programming_language: {
+            in: allowedLanguages
+          }
+        }
+      });
+      
+      // Helper function to normalize language names for display
+      const normalizeLanguageName = (fullName) => {
+        if (fullName.startsWith('JavaScript')) return 'JavaScript';
+        if (fullName.startsWith('Python')) return 'Python';
+        if (fullName.startsWith('C++')) return 'C++';
+        return fullName;
+      };
+      
+      // Group by normalized language name and sum counts
+      const groupedLanguages = {};
+      languageCounts.forEach(lang => {
+        const normalizedName = normalizeLanguageName(lang.programming_language);
+        const count = lang._count.programming_language;
+        
+        if (groupedLanguages[normalizedName]) {
+          groupedLanguages[normalizedName] += count;
+        } else {
+          groupedLanguages[normalizedName] = count;
         }
       });
       
       // Calculate percentages and format data
-      const languageDistribution = languageCounts.map(lang => {
-        const count = lang._count.programming_language;
+      const languageDistribution = Object.entries(groupedLanguages).map(([name, count]) => {
         const percentage = Math.round((count / totalSubmissions) * 100);
         
         return {
-          label: lang.programming_language,
+          label: name,
           value: percentage,
           count
         };
@@ -130,25 +177,7 @@ class Dashboard {
       // Sort by percentage (highest first)
       languageDistribution.sort((a, b) => b.value - a.value);
       
-      // Combine small percentages into "Others" if needed
-      const threshold = 5; // Languages with less than 5% go into "Others"
-      const mainLanguages = languageDistribution.filter(lang => lang.value >= threshold);
-      const others = languageDistribution.filter(lang => lang.value < threshold);
-      
-      let result = [...mainLanguages];
-      
-      if (others.length > 0) {
-        const othersTotal = others.reduce((sum, lang) => sum + lang.value, 0);
-        if (othersTotal > 0) {
-          result.push({
-            label: 'Others',
-            value: othersTotal,
-            count: others.reduce((sum, lang) => sum + lang.count, 0)
-          });
-        }
-      }
-      
-      return result;
+      return languageDistribution;
       
     } catch (error) {
       console.error("Error fetching language distribution:", error);

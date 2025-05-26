@@ -23,13 +23,17 @@ export async function GET(request) {
     }
     
     const rank = await User.getUserRank(userId);
-    const solvedChallenges = await User.getUserChallenges(userId);
+    
+    // Get correct submissions with challenge difficulty
+    const correctSubmissions = await User.getUserCorrectSubmissions(userId);
     
     const byDifficulty = {
-      easy: solvedChallenges.filter(c => c.difficulty === 'easy').length,
-      medium: solvedChallenges.filter(c => c.difficulty === 'medium').length,
-      hard: solvedChallenges.filter(c => c.difficulty === 'hard').length
+      easy: correctSubmissions.filter(s => s.challenges.difficulty.toLowerCase() === 'easy').length,
+      medium: correctSubmissions.filter(s => s.challenges.difficulty.toLowerCase() === 'medium').length,
+      hard: correctSubmissions.filter(s => s.challenges.difficulty.toLowerCase() === 'hard').length
     };
+    
+    const totalSolved = correctSubmissions.length;
     
     const profile = {
       user: {
@@ -44,7 +48,7 @@ export async function GET(request) {
         points: user.points,
       },
       stats: {
-        totalSolved: solvedChallenges.length,
+        totalSolved,
         byDifficulty
       }
     };
