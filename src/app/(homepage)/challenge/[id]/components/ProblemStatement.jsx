@@ -25,6 +25,79 @@ export default function ProblemStatement({
 
   const difficultyColor = getDifficultyColor(difficulty);
 
+  // Function to render examples properly
+  const renderExamples = () => {
+    if (!examples) return "No examples provided";
+    
+    let examplesArray = examples;
+    
+    // If examples is a string that looks like JSON, try to parse it
+    if (typeof examples === 'string') {
+      try {
+        // Check if it's a JSON array string
+        if (examples.trim().startsWith('[') && examples.trim().endsWith(']')) {
+          examplesArray = JSON.parse(examples);
+        } else {
+          // It's a regular string, wrap it in an array
+          examplesArray = [examples];
+        }
+      } catch (e) {
+        // If parsing fails, treat as a single string
+        examplesArray = [examples];
+      }
+    }
+    
+    // If examples is an array of strings (new format)
+    if (Array.isArray(examplesArray)) {
+      return examplesArray.map((example, index) => (
+        <div key={`example-${index}-${example.substring(0, 20)}`} className="mb-4 last:mb-0">
+          <div className="bg-[#111827] rounded-md p-4 font-mono text-sm whitespace-pre-wrap">
+            {example}
+          </div>
+        </div>
+      ));
+    }
+    
+    // Fallback for any other format
+    return (
+      <div className="bg-[#111827] rounded-md p-4 font-mono text-sm whitespace-pre-wrap">
+        {typeof examplesArray === 'string' ? examplesArray : JSON.stringify(examplesArray, null, 2)}
+      </div>
+    );
+  };
+
+  // Function to render constraints properly
+  const renderConstraints = () => {
+    if (!constraints) return <li>No constraints provided</li>;
+    
+    let constraintsArray = constraints;
+    
+    // If constraints is a string that looks like JSON, try to parse it
+    if (typeof constraints === 'string') {
+      try {
+        if (constraints.trim().startsWith('[') && constraints.trim().endsWith(']')) {
+          constraintsArray = JSON.parse(constraints);
+        } else {
+          constraintsArray = [constraints];
+        }
+      } catch (e) {
+        constraintsArray = [constraints];
+      }
+    }
+    
+    // If constraints is an array
+    if (Array.isArray(constraintsArray)) {
+      return constraintsArray.map((constraint, index) => (
+        <li key={`constraint-${index}-${constraint.substring(0, 20)}`} className="mb-1">
+          {constraint}
+        </li>
+      ));
+    }
+    
+    // Fallback
+    return <li>{typeof constraintsArray === 'string' ? constraintsArray : JSON.stringify(constraintsArray)}</li>;
+  };
+
   return (
     <div className="bg-[#1f2937] rounded-lg p-6 shadow-lg text-gray-200 w-full max-w-[600px] h-full overflow-y-auto max-h-full">
       <div className="flex flex-col space-y-5">
@@ -43,22 +116,20 @@ export default function ProblemStatement({
           {description}
         </div>
         
-        {/* Example - mostrar como texto */}
+        {/* Examples - render as array of formatted strings */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Examples</h2>
           <div className="overflow-x-auto">
-            <div className="bg-[#111827] rounded-md p-4 font-mono text-sm whitespace-pre-wrap">
-              {examples}
-            </div>
+            {renderExamples()}
           </div>
         </div>
         
-        {/* Constraints - mostrar como texto */}
+        {/* Constraints - render as list */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Constraints</h2>
           <div className="overflow-x-auto">
             <ul className="list-disc pl-5 text-slate-300">
-              {constraints}
+              {renderConstraints()}
             </ul>
           </div>
         </div>
