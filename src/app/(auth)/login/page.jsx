@@ -1,5 +1,4 @@
 import { LoginForm } from "./components";
-import Leaderboard from "@/components/Leaderboard";
 
 export default function Login() {
   return (

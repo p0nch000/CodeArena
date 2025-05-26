@@ -145,6 +145,18 @@ export default function LoginForm() {
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+        <div className="text-center pt-4 border-t border-mahindra-light-gray/20">
+          <p className="text-sm text-mahindra-light-gray">
+            Don't have an account?{' '}
+            <a 
+              href="/signup" 
+              className="text-mahindra-red hover:text-mahindra-red/80 transition-colors font-medium"
+            >
+              Sign up
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   )
