@@ -120,7 +120,7 @@ export default function Leaderboard({
           classNames={{
             table: "bg-mahindra-dark-blue text-white",
             th: "text-xs font-bold text-zinc-300 bg-zinc-800/50 py-5 text-center uppercase tracking-wider",
-            td: "text-sm text-mahindra-light-gray py-5 text-center",
+            td: "text-sm text-mahindra-light-gray py-3", 
             tr: "border-b border-zinc-800/30 transition-colors",
           }}
         >
@@ -143,21 +143,24 @@ export default function Leaderboard({
                   className="group cursor-pointer hover:bg-red-500/10 transition-all duration-200"
                   onClick={() => handleUserClick(user.id)}
                 >
-                  <TableCell className="text-red-400 font-semibold group-hover:text-red-300">#{globalRank}</TableCell>
+                  <TableCell> <div className="flex justify-center text-red-400 font-semibold group-hover:text-red-300">#{globalRank}</div></TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center space-x-2">
-                      <Avatar
-                        src={user.avatarUrl || generateAvatar(user)}
-                        size="sm"
-                        isBordered
-                        color="danger"
-                        className="mr-2 group-hover:scale-105 transition-transform"
-                      />
-                      <span className="text-mahindra-white font-medium group-hover:text-red-300 transition-colors">{user.name}</span>
+                    <div className="flex justify-center">
+                      <div className="flex items-center space-x-2">
+                        <Avatar
+                          src={user.avatarUrl || generateAvatar(user)}
+                          size="sm"
+                          isBordered
+                          className="w-8 h-8"
+                        />
+                        <span className="text-sm font-medium text-white truncate max-w-[120px]">
+                          {user.name}
+                        </span>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="group-hover:text-white transition-colors">{user.challenges}</TableCell>
-                  <TableCell className="group-hover:text-white transition-colors">{user.points.toLocaleString()}</TableCell>
+                  <TableCell> <div className="flex justify-center group-hover:text-white transition-colors">{user.challenges}</div></TableCell>
+                  <TableCell> <div className="flex justify-center group-hover:text-white transition-colors">{user.points.toLocaleString()}</div></TableCell>
                   <TableCell>
                     <div className="flex justify-center items-center space-x-2">
                       {rankBadgeImage && (

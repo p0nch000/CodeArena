@@ -62,11 +62,11 @@ export function TopLeaderboard({ topUsers = [] }) {
       <table className="w-full">
         <thead>
           <tr className="text-xs font-bold text-zinc-300 bg-zinc-800/50">
-            <th className="py-4 px-4 text-center">#</th>
+            <th className="py-4 px-4 text-center">Rank</th>
             <th className="py-4 px-4 text-left">User</th>
-            <th className="py-4 px-4 text-center">Badge</th>
             <th className="py-4 px-4 text-center">Challenges</th>
             <th className="py-4 px-4 text-center">Points</th>
+            <th className="py-4 px-4 text-center">Badge</th>
           </tr>
         </thead>
         <tbody>
@@ -109,6 +109,8 @@ export function TopLeaderboard({ topUsers = [] }) {
                     <span className="text-white font-medium">{user.name}</span>
                   </div>
                 </td>
+                <td className="py-3 px-4 text-center text-sm text-gray-300">{user.challenges}</td>
+                <td className="py-3 px-4 text-center font-semibold text-white">{user.points.toLocaleString()}</td>
                 <td className="py-3 px-4 text-center">
                   <div className="flex items-center justify-center space-x-2">
                     {rankBadgeImage && (
@@ -136,8 +138,6 @@ export function TopLeaderboard({ topUsers = [] }) {
                     </Chip>
                   </div>
                 </td>
-                <td className="py-3 px-4 text-center text-sm text-gray-300">{user.challenges}</td>
-                <td className="py-3 px-4 text-center font-semibold text-white">{user.points.toLocaleString()}</td>
               </tr>
             );
           })}
