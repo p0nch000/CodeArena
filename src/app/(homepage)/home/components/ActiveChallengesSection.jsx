@@ -1,25 +1,57 @@
 import { CodeChallenge } from './index';
 
 const getBaseUrl = () => {
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+  const vercelUrl = process.env.VERCEL_URL;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  
+  console.log('🔍 Environment variables:');
+  console.log('  VERCEL_URL:', vercelUrl);
+  console.log('  NEXT_PUBLIC_SITE_URL:', siteUrl);
+  
+  let baseUrl;
+  if (vercelUrl) {
+    baseUrl = `https://${vercelUrl}`;
+  } else if (siteUrl) {
+    baseUrl = siteUrl;
+  } else {
+    baseUrl = 'http://localhost:3000';
   }
-  if (process.env.SITE_URL) {
-    return process.env.SITE_URL;
-  }
-  return 'http://localhost:3000';
+  
+  console.log('  🎯 Selected baseUrl:', baseUrl);
+  return baseUrl;
 };
 
 async function getActiveChallenges() {
   try {
     const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/challenges`, { 
+    const fullUrl = `${baseUrl}/api/challenges`;
+    
+    console.log('🚀 Fetching active challenges from:', fullUrl);
+    
+    const response = await fetch(fullUrl, { 
       cache: 'no-store' 
     });
+    
+    console.log('📡 Response status:', response.status);
+    console.log('📡 Response ok:', response.ok);
+    console.log('📡 Response url:', response.url);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Response not ok. Error text:', errorText);
+      return [];
+    }
+    
     const data = await response.json();
+    console.log('✅ Data received:', data);
+    console.log('✅ Active challenges count:', data.activeChallenges?.length || 0);
+    
     return data.success ? data.activeChallenges : [];
   } catch (error) {
-    console.error('Error fetching active challenges:', error);
+    console.error('💥 Error fetching active challenges:', error);
+    console.error('💥 Error name:', error.name);
+    console.error('💥 Error message:', error.message);
+    console.error('💥 Error stack:', error.stack);
     return [];
   }
 }
